@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi"
+     xmlns:util='http://schemas.microsoft.com/wix/UtilExtension'>
+  <Fragment>
+    <DirectoryRef Id="INSTALLLOCATION">
+      <Directory Id="KEYPROVIDER" Name="Key Provider Service">
+        <Component Id="KeyProviderComponent" Guid="{FA7DB818-33AC-46A8-9CA1-96995072D42B}">
+          <File Id="ConfigFile3434" Name="DIS.Services.KeyProviderService.exe.config" Source="$(var.KeyProviderService.TargetDir)DIS.Services.KeyProviderService.exe.config"/>
+          <File Id="KeyProvider.KeyProviderListener45" Source="$(var.KeyProviderService.TargetDir)KeyProviderListener.dll"/>
+          <File Id="KeyProvider.Client33" Source="$(var.KeyProviderService.TargetDir)DIS.Business.Client.dll"/>
+          <File Id="KeyProvider.Proxy44" Source="$(var.KeyProviderService.TargetDir)DIS.Business.Proxy.dll"/>
+          <File Id="KeyProvider.Utility44" Source="$(var.KeyProviderService.TargetDir)DIS.Common.Utility.dll"/>
+          <File Id="KeyProvider.Library55" Source="$(var.KeyProviderService.TargetDir)DIS.Business.Library.dll"/>
+          <File Id="KeyProvider.DataAccess4545" Source="$(var.KeyProviderService.TargetDir)DIS.Data.DataAccess.dll"/>
+          <File Id="KeyProvider.DataContract478"  Source="$(var.KeyProviderService.TargetDir)DIS.Data.DataContract.dll"/>
+          <File Id="KeyProvider.ServiceContract"  Source="$(var.KeyProviderService.TargetDir)DIS.Data.ServiceContract.dll"/>
+          <File Id="InstallerFile5656" Source="$(var.KeyProviderService.TargetDir)DIS.Services.KeyProviderService.exe" KeyPath="yes"/>
+          <File Id="KeyProvider.Common7888"  Source="$(var.KeyProviderService.TargetDir)Microsoft.Practices.EnterpriseLibrary.Common.dll"/>
+          <File Id="KeyProvider.Data445"  Source="$(var.KeyProviderService.TargetDir)Microsoft.Practices.EnterpriseLibrary.Data.dll"/>
+          <File Id="KeyProvider.ExceptionHandling77"  Source="$(var.KeyProviderService.TargetDir)Microsoft.Practices.EnterpriseLibrary.ExceptionHandling.dll"/>
+          <File Id="KeyProvider.ExceptionHandlingLogging11"  Source="$(var.KeyProviderService.TargetDir)Microsoft.Practices.EnterpriseLibrary.ExceptionHandling.Logging.dll"/>
+          <File Id="KeyProvider.LoggingDatabase044"  Source="$(var.KeyProviderService.TargetDir)Microsoft.Practices.EnterpriseLibrary.Logging.Database.dll"/>
+          <File Id="KeyProvider.Logging88"  Source="$(var.KeyProviderService.TargetDir)Microsoft.Practices.EnterpriseLibrary.Logging.dll"/>
+          <File Id="KeyProvider.ServiceLocation78"  Source="$(var.KeyProviderService.TargetDir)Microsoft.Practices.ServiceLocation.dll"/>
+          <File Id="KeyProvider.Unity898989"  Source="$(var.KeyProviderService.TargetDir)Microsoft.Practices.Unity.dll"/>
+          <File Id="KeyProvider.Interception898989"  Source="$(var.KeyProviderService.TargetDir)Microsoft.Practices.Unity.Interception.dll"/>
+          <File Id="KeyProvider.Web556899"  Source="$(var.KeyProviderService.TargetDir)Microsoft.ServiceModel.Web.dll"/>
+          <File Id="KeyProvider.Http899" Source="$(var.KeyProviderService.TargetDir)Microsoft.Http.dll"/>
+          <File Id="KeyProvider.EntityFramework888" Source="..\Resources\EntityFramework.dll"/>
+          <File Id="KeyProvider.msvcr100" Source="..\Resources\msvcr100.dll"/>
+          <RemoveFile Id="PurgeFiles5466" Name="*.*" On="uninstall"/>
+          <ServiceInstall
+              Id="KeyProviderServiceInstaller"
+              Type="ownProcess"
+              Vital="yes"
+              Name="KeyProviderService - Default"
+              DisplayName="KeyProviderService - Default"
+              Description="OEM Activation 3.0 Key Provider Service"
+              Start="auto"
+              Account="NT AUTHORITY\LocalService"
+              ErrorControl="normal"
+              Interactive="no">
+          </ServiceInstall>
+          <ServiceControl Id="KeyProviderStartService" Stop="both" Remove="uninstall" Name="KeyProviderService - Default" Wait="no" />
+        </Component>
+      </Directory>
+    </DirectoryRef>
+  </Fragment>
+</Wix>
