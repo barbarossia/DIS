@@ -73,6 +73,8 @@ namespace DIS.Business.Client
         /// <returns></returns>
         Guid ReportCbr(Cbr cbr);
 
+        Cbr SearchSubmittedCbr(Cbr cbr);
+
         /// <summary>
         /// Invoke computerbuildreport/acknowledgements API of Microsoft to get a list of available CBR ACKs
         /// </summary>
@@ -91,6 +93,8 @@ namespace DIS.Business.Client
         /// <param name="returnReport"></param>
         /// <returns></returns>
         Guid ReportReturn(ReturnReport returnReport);
+
+        ReturnReport SearchSubmittedReturn(ReturnReport returnReport);
 
         /// <summary>
         /// Invoke ReturnReport/acknowledgements API of Microsoft to get a list of available ReturnReport ACKs

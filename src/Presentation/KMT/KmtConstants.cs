@@ -91,9 +91,12 @@ namespace DIS.Presentation.KMT
             get { return Constants.InstallType == InstallType.FactoryFloor; }
         }
 
-        public static string InventoryName {
-            get { 
-                switch(Constants.InstallType){
+        public static string InventoryName
+        {
+            get
+            {
+                switch (Constants.InstallType)
+                {
                     case InstallType.Oem:
                         return "Corporate Key Inventory";
                     case InstallType.Tpi:
@@ -112,7 +115,8 @@ namespace DIS.Presentation.KMT
         public const int MaxInterval = 9999;
         public const int DefaultPageSize = 10;
         public static readonly string[] PageSizeList;
-        public static double NotificationCheckInterval {
+        public static double NotificationCheckInterval
+        {
             get { return double.Parse(ConfigurationManager.AppSettings["NotificationCheckInterval"]); }
         }
 

@@ -147,16 +147,20 @@ namespace DIS.Presentation.KMT.ViewModel.ControlsViewModel
             {
                 this.ReturnKeys.ToList().ForEach(k =>
                 {
-                    k.ReturnRequestTypes.Add(ResourcesOfR6.ReturnKeysView_ZOEDescription);
-                    k.ReturnRequestTypes.Add(ResourcesOfR6.ReturnKeysView_ZOFDescription);
+                    if (!k.ReturnRequestTypes.Contains(ResourcesOfR6.ReturnKeysView_ZOEDescription))
+                        k.ReturnRequestTypes.Add(ResourcesOfR6.ReturnKeysView_ZOEDescription);
+                    if (!k.ReturnRequestTypes.Contains(ResourcesOfR6.ReturnKeysView_ZOFDescription))
+                        k.ReturnRequestTypes.Add(ResourcesOfR6.ReturnKeysView_ZOFDescription);
                 });
             }
             else
             {
                 this.ReturnKeys.ToList().ForEach(k =>
                 {
-                    k.ReturnRequestTypes.Remove(ResourcesOfR6.ReturnKeysView_ZOEDescription);
-                    k.ReturnRequestTypes.Remove(ResourcesOfR6.ReturnKeysView_ZOFDescription);
+                    if (k.ReturnRequestTypes.Contains(ResourcesOfR6.ReturnKeysView_ZOEDescription))
+                        k.ReturnRequestTypes.Remove(ResourcesOfR6.ReturnKeysView_ZOEDescription);
+                    if (k.ReturnRequestTypes.Contains(ResourcesOfR6.ReturnKeysView_ZOFDescription))
+                        k.ReturnRequestTypes.Remove(ResourcesOfR6.ReturnKeysView_ZOFDescription);
                 });
             }
         }

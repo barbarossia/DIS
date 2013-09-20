@@ -27,11 +27,13 @@ using Microsoft.Http;
 using Microsoft.ServiceModel.Web;
 using DC = DIS.Data.DataContract;
 
-namespace DIS.Business.Client {
+namespace DIS.Business.Client
+{
     /// <summary>
     /// Provides logics to connect with REST web services
     /// </summary>
-    public class ServiceClient : IServiceClient {
+    public class ServiceClient : IServiceClient
+    {
         /// <summary>
         /// HTTP header name of system ID
         /// </summary>
@@ -69,7 +71,8 @@ namespace DIS.Business.Client {
         /// <param name="callDirection"></param>
         /// <param name="user"></param>
         public ServiceClient(int? systemId, CallDirection callDirection, User user)
-            : this(systemId, callDirection, user, null, null, null) {
+            : this(systemId, callDirection, user, null, null, null)
+        {
         }
 
         /// <summary>
@@ -82,47 +85,57 @@ namespace DIS.Business.Client {
         /// <param name="hqManager"></param>
         /// <param name="ssManager"></param>
         public ServiceClient(int? systemId, CallDirection callDirection, User user,
-            IConfigManager configManager, IHeadQuarterManager hqManager, ISubsidiaryManager ssManager) {
+            IConfigManager configManager, IHeadQuarterManager hqManager, ISubsidiaryManager ssManager)
+        {
             this.callDirection = callDirection;
             this.systemId = systemId;
             IConfigManager cfgMgr = configManager ?? new ConfigManager();
 
             ServiceConfig serviceConfig;
-            if ((callDirection & CallDirection.Internal) != 0) {
+            if ((callDirection & CallDirection.Internal) != 0)
+            {
                 if (user == null)
                     throw new ApplicationException("Internal web service needs authentication.");
                 serviceConfig = cfgMgr.GetInternalServiceConfig();
                 serviceConfig.UserName = user.LoginId;
                 serviceConfig.UserKey = user.Password;
             }
-            else {
+            else
+            {
                 proxySetting = cfgMgr.GetProxySetting();
-                if (callDirection == CallDirection.UpLevelSystem) {
+                if (callDirection == CallDirection.UpLevelSystem)
+                {
                     IHeadQuarterManager hqMgr = hqManager ?? new HeadQuarterManager();
                     HeadQuarter hq = hqMgr.GetHeadQuarter(systemId.Value);
-                    serviceConfig = new ServiceConfig() {
+                    serviceConfig = new ServiceConfig()
+                    {
                         ServiceHostUrl = hq.ServiceHostUrl,
                         UserName = hq.UserName,
                         UserKey = hq.AccessKey
                     };
                 }
-                else if (callDirection == CallDirection.DownLevelSystem) {
+                else if (callDirection == CallDirection.DownLevelSystem)
+                {
                     ISubsidiaryManager ssMgr = ssManager ?? new SubsidiaryManager();
                     Subsidiary ss = ssMgr.GetSubsidiary(systemId.Value);
-                    serviceConfig = new ServiceConfig() {
+                    serviceConfig = new ServiceConfig()
+                    {
                         ServiceHostUrl = ss.ServiceHostUrl,
                         UserName = ss.UserName,
                         UserKey = ss.AccessKey
                     };
                 }
-                else {
+                else
+                {
                     serviceConfig = cfgMgr.GetMsServiceConfig();
                     if (systemId == null)
                         microsoftCertificate = cfgMgr.GetCertificateSubject();
-                    else {
+                    else
+                    {
                         IHeadQuarterManager hqMgr = hqManager ?? new HeadQuarterManager();
                         HeadQuarter hq = hqMgr.GetHeadQuarter(systemId.Value);
-                        microsoftCertificate = new DisCert {
+                        microsoftCertificate = new DisCert
+                        {
                             Subject = hq.CertSubject,
                             ThumbPrint = hq.CertThumbPrint
                         };
@@ -132,7 +145,8 @@ namespace DIS.Business.Client {
             Initialize(serviceConfig);
         }
 
-        private void Initialize(ServiceConfig serviceConfig) {
+        private void Initialize(ServiceConfig serviceConfig)
+        {
             this.helper = new ServiceLocationHelper(serviceConfig.ServiceHostUrl);
             this.userName = serviceConfig.UserName;
             this.userKey = serviceConfig.UserKey;
@@ -141,7 +155,8 @@ namespace DIS.Business.Client {
             ServicePointManager.ServerCertificateValidationCallback += new RemoteCertificateValidationCallback(CustomCertificateValidation);
         }
 
-        private bool CustomCertificateValidation(object sender, X509Certificate cert, X509Chain chain, SslPolicyErrors error) {
+        private bool CustomCertificateValidation(object sender, X509Certificate cert, X509Chain chain, SslPolicyErrors error)
+        {
             if ((error & ~SslPolicyErrors.RemoteCertificateNameMismatch) == SslPolicyErrors.None)
                 return true;
             else
@@ -158,42 +173,48 @@ namespace DIS.Business.Client {
         /// <summary>
         /// Test if internal web service can be connected
         /// </summary>
-        public void TestInternal() {
+        public void TestInternal()
+        {
             Request(null, helper.TestInternal, HttpMethod.GET);
         }
 
         /// <summary>
         /// Test if external web service can be connected
         /// </summary>
-        public void TestExternal() {
+        public void TestExternal()
+        {
             Request(null, helper.TestExternal, HttpMethod.GET);
         }
 
         /// <summary>
         /// Test if Data Polling Service can be connected
         /// </summary>
-        public void TestDataPollingService() {
+        public void TestDataPollingService()
+        {
             Request(null, helper.TestDPS, HttpMethod.GET);
         }
 
         /// <summary>
         /// Test if Key Provider Service can be connected
         /// </summary>
-        public void TestKeyProviderService() {
+        public void TestKeyProviderService()
+        {
             Request(null, helper.TestKPS, HttpMethod.GET);
         }
 
         /// <summary>
         /// Data Polling Service report self state
         /// </summary>
-        public void DataPollingServiceReport() {
+        public void DataPollingServiceReport()
+        {
             Request(null, helper.DPSReport, HttpMethod.GET);
         }
 
         /// <summary>
         /// Key Provider Service report self state
         /// </summary>
-        public void KeyProviderServiceReport() {
+        public void KeyProviderServiceReport()
+        {
             Request(null, helper.KPSReport, HttpMethod.GET);
         }
 
@@ -203,7 +224,8 @@ namespace DIS.Business.Client {
         /// Invoke fulfillments API of Microsoft
         /// </summary>
         /// <returns></returns>
-        public List<DC.FulfillmentInfo> GetFulfilments() {
+        public List<DC.FulfillmentInfo> GetFulfilments()
+        {
             if ((callDirection & CallDirection.Internal) != 0)
                 return Request<List<DC.FulfillmentInfo>>(null, helper.RetrieveFulfilmentUrl, HttpMethod.GET);
             else
@@ -215,7 +237,8 @@ namespace DIS.Business.Client {
         /// </summary>
         /// <param name="fulfillmentId"></param>
         /// <returns></returns>
-        public List<KeyInfo> FulfillKeys(string fulfillmentId) {
+        public List<KeyInfo> FulfillKeys(string fulfillmentId)
+        {
             if ((callDirection & CallDirection.Internal) != 0)
                 return Request<List<KeyInfo>>(fulfillmentId, helper.GetFulfilledKeysUrl, HttpMethod.GET);
             else
@@ -227,18 +250,47 @@ namespace DIS.Business.Client {
         /// </summary>
         /// <param name="cbr"></param>
         /// <returns></returns>
-        public Guid ReportCbr(Cbr cbr) {
+        public Guid ReportCbr(Cbr cbr)
+        {
             if ((callDirection & CallDirection.Internal) != 0)
                 return Request<Guid>(cbr, helper.ReportBindingUrl, HttpMethod.POST);
             else
                 return Request<ComputerBuildReportResponse>(cbr.ToBindingReport(), helper.ReportBindingUrl, HttpMethod.POST).ReportUniqueID;
         }
 
+        public Cbr SearchSubmittedCbr(Cbr cbr)
+        {
+            if ((callDirection & CallDirection.Internal) != 0)
+                return Request<Cbr>(cbr, helper.CBRSearchUrl, HttpMethod.POST);
+            else
+            {
+                try
+                {
+                    CbrSearchSubmittedResponse[] responses = Request<CbrSearchSubmittedResponse[]>("SearchSubmitted?CustomerReportUniqueID=" + cbr.CbrUniqueId, helper.CBRSearchUrl, HttpMethod.GET);
+                    CbrSearchSubmittedResponse response = responses.OrderByDescending(r => r.ReportReceiptDateUTC).First();
+                    return new Cbr()
+                    {
+                        CbrUniqueId = response.CustomerReportUniqueID,
+                        MsReportUniqueId = response.MSReportUniqueID,
+                        MsReceivedDateUtc = response.ReportReceiptDateUTC
+                    };
+                }
+                catch (WebProtocolException ex)
+                {
+                    if (ex.StatusCode == HttpStatusCode.NotFound)
+                        return null;
+                    else
+                        throw;
+                }
+            }
+        }
+
         /// <summary>
         /// Invoke computerbuildreport/acknowledgements API of Microsoft to get a list of available CBR ACKs
         /// </summary>
         /// <returns></returns>
-        public Guid[] RetrieveCbrAcks() {
+        public Guid[] RetrieveCbrAcks()
+        {
             if ((callDirection & CallDirection.Internal) != 0)
                 return Request<Guid[]>(null, helper.CBRAckUrl, HttpMethod.GET);
             else
@@ -249,12 +301,15 @@ namespace DIS.Business.Client {
         /// Invoke computerbuildreport/acknowledgements API of Microsoft with specified CBR to retrieve its ACK
         /// </summary>
         /// <returns></returns>
-        public Cbr RetrieveCbrAck(Cbr cbr) {
-            if ((callDirection & CallDirection.Internal) != 0) {
+        public Cbr RetrieveCbrAck(Cbr cbr)
+        {
+            if ((callDirection & CallDirection.Internal) != 0)
+            {
                 return Request<Cbr>(cbr, helper.CBRAckUrl, HttpMethod.POST);
             }
-            else {
-                var response = Request<ComputerBuildReportAckResponse>(cbr.MsReportUniqueId.Value, helper.CBRAckUrl, HttpMethod.GET);
+            else
+            {
+                var response = Request<ComputerBuildReportAckResponse>(cbr.MsReportUniqueId.Value + "?status=All", helper.CBRAckUrl, HttpMethod.GET);
                 return response.FromServiceContract();
             }
         }
@@ -264,18 +319,48 @@ namespace DIS.Business.Client {
         /// </summary>
         /// <param name="returnReport"></param>
         /// <returns></returns>
-        public Guid ReportReturn(ReturnReport returnReport) {
+        public Guid ReportReturn(ReturnReport returnReport)
+        {
             if ((callDirection & CallDirection.Internal) != 0)
                 return Request<Guid>(returnReport, helper.ReportReturnUrl, HttpMethod.POST);
             else
                 return Request<ReturnResponse>(returnReport.ToReturnReport(), helper.ReportReturnUrl, HttpMethod.POST).ReturnUniqueID;
         }
 
+        public ReturnReport SearchSubmittedReturn(ReturnReport returnReport)
+        {
+            if ((callDirection & CallDirection.Internal) != 0)
+                return Request<ReturnReport>(returnReport, helper.ReturnSearchUrl, HttpMethod.POST);
+            else
+            {
+                try
+                {
+                    ReturnSearchSubmittedResponse[] responses = Request<ReturnSearchSubmittedResponse[]>(string.Format("SearchSubmitted?OEMRMANumber={0}&OEMRMADateUTC={1:yyyy-MM-ddTHH:mm:ss.fffK}", returnReport.OemRmaNumber, DateTime.SpecifyKind(returnReport.OemRmaDateUTC.Value, DateTimeKind.Utc)), helper.ReturnSearchUrl, HttpMethod.GET);
+                    ReturnSearchSubmittedResponse response = responses.OrderByDescending(r => r.ReturnReceiptDateUTC).First();
+                    return new ReturnReport()
+                    {
+                        CustomerReturnUniqueId = returnReport.CustomerReturnUniqueId,
+                        ReturnUniqueId = response.ReturnUniqueID,
+                        ReturnDateUTC = response.ReturnReceiptDateUTC,
+                        OemRmaDateUTC = response.OEMRMADateUTC
+                    };
+                }
+                catch (WebProtocolException ex)
+                {
+                    if (ex.StatusCode == HttpStatusCode.NotFound)
+                        return null;
+                    else
+                        throw;
+                }
+            }
+        }
+
         /// <summary>
         /// Invoke ReturnReport/acknowledgements API of Microsoft to get a list of available ReturnReport ACKs
         /// </summary>
         /// <returns></returns>
-        public Guid[] RetrieveReturnReportAcks() {
+        public Guid[] RetrieveReturnReportAcks()
+        {
             if ((callDirection & CallDirection.Internal) != 0)
                 return Request<Guid[]>(null, helper.ReturnAckUrl, HttpMethod.GET);
             else
@@ -286,11 +371,14 @@ namespace DIS.Business.Client {
         /// Invoke ReturnReport/acknowledgements API of Microsoft with specified CBR to retrieve its ACK
         /// </summary>
         /// <returns></returns>
-        public ReturnReport RetrievReturnReportAck(ReturnReport returnReport) {
-            if ((callDirection & CallDirection.Internal) != 0) {
+        public ReturnReport RetrievReturnReportAck(ReturnReport returnReport)
+        {
+            if ((callDirection & CallDirection.Internal) != 0)
+            {
                 return Request<ReturnReport>(returnReport, helper.ReturnAckUrl, HttpMethod.POST);
             }
-            else {
+            else
+            {
                 var response = Request<ReturnAck>(returnReport.ReturnUniqueId, helper.ReturnAckUrl, HttpMethod.GET);
                 return response.FromServiceContract();
             }
@@ -300,7 +388,8 @@ namespace DIS.Business.Client {
         /// Get keys from up level system
         /// </summary>
         /// <returns></returns>
-        public List<KeyInfo> GetKeys() {
+        public List<KeyInfo> GetKeys()
+        {
             return Request<KeyInfo[]>(null, helper.GetKeysUrl, HttpMethod.GET).ToList();
         }
 
@@ -308,7 +397,8 @@ namespace DIS.Business.Client {
         /// Send sync notification after keys gotten
         /// </summary>
         /// <param name="keys"></param>
-        public void SyncKeys(List<KeyInfo> keys) {
+        public void SyncKeys(List<KeyInfo> keys)
+        {
             Request(keys.ToArray(), helper.SyncKeysUrl, HttpMethod.POST);
         }
 
@@ -317,7 +407,8 @@ namespace DIS.Business.Client {
         /// </summary>
         /// <param name="keys"></param>
         /// <returns></returns>
-        public List<KeyInfo> ReportKeys(List<KeyInfo> keys) {
+        public List<KeyInfo> ReportKeys(List<KeyInfo> keys)
+        {
             return Request<KeyInfo[]>(keys.ToArray(), helper.ReportKeysUrl, HttpMethod.POST).ToList();
         }
 
@@ -325,7 +416,8 @@ namespace DIS.Business.Client {
         /// Recall keys to up level system
         /// </summary>
         /// <param name="keys"></param>
-        public void RecallKeys(List<KeyInfo> keys) {
+        public void RecallKeys(List<KeyInfo> keys)
+        {
             Request(keys.ToArray(), helper.RecallKeysUrl, HttpMethod.POST);
         }
 
@@ -333,7 +425,8 @@ namespace DIS.Business.Client {
         /// Copy fulfilled keys to up level system which got from Microsoft
         /// </summary>
         /// <param name="keys"></param>
-        public void CarbonCopyFulfilledKeys(List<KeyInfo> keys) {
+        public void CarbonCopyFulfilledKeys(List<KeyInfo> keys)
+        {
             Request(keys.ToArray(), helper.CarbonCopyFulfilledKeysUrl, HttpMethod.POST);
         }
 
@@ -341,7 +434,8 @@ namespace DIS.Business.Client {
         /// Copy reported keys to up level system which sent to Microsoft
         /// </summary>
         /// <param name="keys"></param>
-        public void CarbonCopyReportedKeys(List<KeyInfo> keys) {
+        public void CarbonCopyReportedKeys(List<KeyInfo> keys)
+        {
             Request(keys.ToArray(), helper.CarbonCopyReportedKeysUrl, HttpMethod.POST);
         }
 
@@ -349,7 +443,8 @@ namespace DIS.Business.Client {
         /// Copy return reported keys to up level system which sent to Microsoft
         /// </summary>
         /// <param name="keys"></param>
-        public void CarbonCopyReturnReportedKeys(List<KeyInfo> keys) {
+        public void CarbonCopyReturnReportedKeys(List<KeyInfo> keys)
+        {
             Request(keys.ToArray(), helper.CarbonCopyReturnReportedKeysUrl, HttpMethod.POST);
         }
 
@@ -366,7 +461,8 @@ namespace DIS.Business.Client {
         /// Sync keys to down level system
         /// </summary>
         /// <param name="syncs"></param>
-        public long[] SendKeySyncNotifications(List<KeySyncNotification> syncs) {
+        public long[] SendKeySyncNotifications(List<KeySyncNotification> syncs)
+        {
             return Request<long[]>(syncs.ToArray(), helper.SyncUrl, HttpMethod.POST);
         }
 
@@ -374,29 +470,35 @@ namespace DIS.Business.Client {
 
         #region Private & protected methods
 
-        private string Request(object request, string url, HttpMethod method) {
+        private string Request(object request, string url, HttpMethod method)
+        {
             HttpResponseMessage response = null;
-            string postData = null;
-            using (var webClient = new HttpClient()) {
+            string parameter = null;
+            using (var webClient = new HttpClient())
+            {
                 webClient.TransportSettings.ConnectionTimeout = new TimeSpan(0, timeoutMinutes, 0);
 
                 // set credentials
-                if (callDirection == CallDirection.Microsoft) {
+                if (callDirection == CallDirection.Microsoft)
+                {
                     if (microsoftCertificate == null)
                         throw new ApplicationException("MicrosoftCertificate is null.");
                     webClient.TransportSettings.ClientCertificates.Add(EncryptionHelper.GetCertificate(
                         StoreName.My, StoreLocation.CurrentUser, X509FindType.FindByThumbprint, microsoftCertificate.ThumbPrint));
                 }
-                else {
+                else
+                {
                     webClient.DefaultHeaders.Add(AuthorizationHeaderName, GetAuthHeader(userName, userKey));
                     webClient.DefaultHeaders.Add(DirectionHeaderName, ((callDirection & ~CallDirection.Internal)).ToString());
                     if ((callDirection & CallDirection.Internal) != 0)
                         webClient.DefaultHeaders.Add(SystemIdHeaderName, systemId == null ? string.Empty : systemId.ToString());
                 }
 
-                if (proxySetting != null) {
+                if (proxySetting != null)
+                {
                     IWebProxy proxy = null;
-                    if (proxySetting.ProxyType == ProxyType.Custom) {
+                    if (proxySetting.ProxyType == ProxyType.Custom)
+                    {
                         proxy = new WebProxy(proxySetting.ServiceConfig.ServiceHostUrl,
                             proxySetting.BypassProxyOnLocal);
                         proxy.Credentials = new NetworkCredential(proxySetting.ServiceConfig.UserName,
@@ -408,39 +510,54 @@ namespace DIS.Business.Client {
                 }
 
                 // send request
-                if (method == HttpMethod.GET) {
+                if (method == HttpMethod.GET)
+                {
                     if (request != null && request.ToString().Length > 0)
                         url += string.Format("/{0}", request.ToString());
                     response = webClient.Get(url);
                 }
-                else {
-                    postData = request.ToDataContract();
-                    using (HttpContent content = HttpContent.Create(postData, Encoding.UTF8, contentType)) {
+                else
+                {
+                    parameter = request.ToDataContract();
+                    using (HttpContent content = HttpContent.Create(parameter, Encoding.UTF8, contentType))
+                    {
                         response = webClient.Send(method, url, content);
                     }
                 }
             }
-            CheckStatusCode(response);
             string responseData = response.Content.ReadAsString();
             if (ShouldLogResponseData)
-                Log(url, method.ToString(), contentType, postData,
+                Log(url, method.ToString(), contentType, parameter,
                     response.StatusCode.ToString(), responseData, response.Content.ContentType);
+            CheckStatusCode(response);
             return responseData;
         }
 
-        private T Request<T>(object request, string url, HttpMethod method) {
-            return Request(request, url, method).FromDataContract<T>();
+        private T Request<T>(object request, string url, HttpMethod method)
+        {
+            string response = Request(request, url, method);
+            try
+            {
+                return response.FromDataContract<T>();
+            }
+            catch
+            {
+                return default(T);
+            }
         }
 
         private void Log(string url, string httpMethod, string contentType, string postData,
-            string responseCode, string responseData, string responseType) {
+            string responseCode, string responseData, string responseType)
+        {
             string message = string.Format("URL: {1}{0}Http Method: {2}{0}Request Type: {3}{0}Post Data: {4}{0}Response Code: {5}{0}Response Data: {6}{0}Response Type: {7}{0}",
                 Environment.NewLine + Environment.NewLine, url, httpMethod, contentType, postData, responseCode, responseData, responseType);
             MessageLogger.LogSystemRunning("Service Traffic", message);
         }
 
-        private void CheckStatusCode(HttpResponseMessage response) {
-            switch (response.StatusCode) {
+        private void CheckStatusCode(HttpResponseMessage response)
+        {
+            switch (response.StatusCode)
+            {
                 case HttpStatusCode.OK:
                     return;
                 case HttpStatusCode.BadRequest:
@@ -458,7 +575,8 @@ namespace DIS.Business.Client {
             }
         }
 
-        private string GetAuthHeader(string username, string password) {
+        private string GetAuthHeader(string username, string password)
+        {
             var encodedCred = Convert.ToBase64String(Encoding.UTF8.GetBytes(
                 string.Format("{0}:{1}", username, password)));
             return string.Format("Basic {0}", encodedCred);
@@ -467,4 +585,3 @@ namespace DIS.Business.Client {
         #endregion
     }
 }
-

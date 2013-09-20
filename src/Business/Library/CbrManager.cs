@@ -54,6 +54,15 @@ namespace DIS.Business.Library
             return cbrRepository.SearchCbrs(criteria);
         }
 
+        public Cbr GetFirstSentCbr()
+        {
+            CbrSearchCriteria criteria = new CbrSearchCriteria()
+            {
+                CbrStatus = CbrStatus.Sent,
+            };
+            return cbrRepository.SearchCbrs(criteria).FirstOrDefault();
+        }
+
         public List<Cbr> GetReportedCbrs()
         {
             CbrSearchCriteria criteria = new CbrSearchCriteria()
@@ -107,7 +116,7 @@ namespace DIS.Business.Library
                     OemOptionalInfo = k.OemOptionalInfo.ToString(),
                 }).ToList()
             };
-            cbrRepository.InsertCbrAndCbrKeys(cbr, context = null);
+            cbrRepository.InsertCbrAndCbrKeys(cbr, context);
             return cbr;
         }
 
@@ -126,13 +135,25 @@ namespace DIS.Business.Library
             return xDoc.DocumentElement.OuterXml;
         }
 
-        public void UpdateCbrAfterReported(Cbr cbr)
+        public void UpdateCbrIfSendingFailed(Cbr cbr)
+        {
+            cbr.CbrStatus = CbrStatus.Sent;
+            cbrRepository.UpdateCbr(cbr);
+        }
+
+        public void UpdateCbrIfSearchResultEmpty(Cbr cbr)
+        {
+            cbr.CbrStatus = CbrStatus.Generated;
+            cbrRepository.UpdateCbr(cbr);
+        }
+
+        public void UpdateCbrAfterReported(Cbr cbr, KeyStoreContext context)
         {
             if (!cbr.MsReportUniqueId.HasValue || cbr.MsReportUniqueId == Guid.Empty)
                 throw new ArgumentException("CBR is invalid.");
 
             cbr.CbrStatus = CbrStatus.Reported;
-            cbrRepository.UpdateCbr(cbr);
+            cbrRepository.UpdateCbr(cbr, context);
         }
 
         public void UpdateCbrsAfterAckReady(List<Cbr> cbrs)

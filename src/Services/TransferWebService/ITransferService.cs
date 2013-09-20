@@ -36,6 +36,10 @@ namespace DIS.Services.TransferWebService
         Guid ReportCbr(Cbr request);
 
         [OperationContract]
+        [WebInvoke(UriTemplate = "/computerbuildreport/royd/v1", Method = "POST")]
+        Cbr SearchSubmittedCbr(Cbr cbr);
+
+        [OperationContract]
         [WebGet(UriTemplate = "/computerbuildreport/acknowledgements")]
         Guid[] RetrieveCbrAcks();
 
@@ -50,6 +54,10 @@ namespace DIS.Services.TransferWebService
         [OperationContract]
         [WebGet(UriTemplate = "/return/acknowledgements")]
         Guid[] RetrieveReturnAcks();
+
+        [OperationContract]
+        [WebInvoke(UriTemplate = "/return/royd/v1", Method = "POST")]
+        ReturnReport SearchSubmittedReturn(ReturnReport returnReport);
 
         [OperationContract]
         [WebInvoke(UriTemplate = "/return/acknowledgements", Method = "POST")]

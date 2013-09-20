@@ -20,9 +20,9 @@ namespace DIS.Presentation.KMT.Views.Key.ReportKeysView
     {
         public new ReportKeysViewModel VM { get; private set; }
 
-        public ReportKeysWizard(IKeyProxy keyProxy)
+        public ReportKeysWizard(IKeyProxy keyProxy,IConfigProxy configProxy)
         {
-            VM = new ReportKeysViewModel(keyProxy);
+            VM = new ReportKeysViewModel(keyProxy,configProxy);
             VM.View = this;
             VM.StepPages.Add(new ReportKeysSelection(VM));
             VM.StepPages.Add(new ReportKeysSummary(VM));

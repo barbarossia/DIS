@@ -31,6 +31,7 @@ namespace DIS.Business.Library
                 throw new NotSupportedException();
 
             searchCriteria.HqId = CurrentHeadQuarterId;
+            searchCriteria.IsInProgress = false;
             if (searchCriteria.KeyType == KeyType.All)
             {
                 if (searchCriteria.KeyStateIds != null)
@@ -99,11 +100,13 @@ namespace DIS.Business.Library
         {
             if (key == null)
                 return KeyErrorType.NotFound;
+            else if (key.KeyInfoEx.IsInProgress)
+                return KeyErrorType.Invalid;
             else if (!ValidateKeyState(
                 () =>
                 {
                     key.FactoryFloorRevertKey();
-                    key.HardwareHash =string.Empty;
+                    key.HardwareHash = string.Empty;
                     key.OemOptionalInfo = new OemOptionalInfo();
                     key.TrackingInfo = string.Empty;
                 }))

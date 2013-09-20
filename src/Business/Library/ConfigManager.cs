@@ -32,6 +32,7 @@ namespace DIS.Business.Library
         private const string reportIntervalName = "ReportInterval";
         private const string isAutoFulfillmentOnName = "IsAutoFulfillmentOn";
         private const string isAutoReportOnName = "IsAutoReportOn";
+        private const string isRequireOHRDataName = "IsRequireOHRData";
         private const string isMsServiceEnabledConfigName = "IsMsServiceEnabled";
         private const string internalServiceConfigName = "InternalServiceConfig";
         private const string msServiceConfigName = "MsServiceConfig";
@@ -94,6 +95,11 @@ namespace DIS.Business.Library
         public bool GetCanAutoReport()
         {
             return GetConfigurationValue<bool>(isAutoReportOnName);
+        }
+
+        public bool GetRequireOHRData()
+        {
+            return GetConfigurationValue<bool>(isRequireOHRDataName);
         }
 
         public ServiceConfig GetTestingServiceConfig()
@@ -159,6 +165,11 @@ namespace DIS.Business.Library
         public void UpdateAutoReportSwitch(bool isAutoReportOn)
         {
             UpdateConfiguration(isAutoReportOnName, isAutoReportOn);
+        }
+
+        public void UpdateRequireOHRDataSwitch(bool isRequireOHRData)
+        {
+            UpdateConfiguration(isRequireOHRDataName, isRequireOHRData);
         }
 
         public void UpdateMsServiceEnabledSwitch(bool isMsServiceEnabled)

@@ -55,6 +55,7 @@ namespace DIS.Data.DataAccess.Repository
                 {
                     context.Database.ExecuteSqlCommand(string.Format(deleteSqlCommandFormat, tableName, idColumnName, idList));
                 }
+                context.SaveChanges();
             }
         }
 

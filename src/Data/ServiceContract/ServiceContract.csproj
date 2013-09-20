@@ -68,6 +68,8 @@
     <Compile Include="Contracts\Reporting\ComputerBuildReportAckResponse.cs" />
     <Compile Include="Contracts\Reporting\ComputerBuildReportRequest.cs" />
     <Compile Include="Contracts\Reporting\ComputerBuildReportResponse.cs" />
+    <Compile Include="Contracts\Reporting\ReturnSearchSubmittedResponse.cs" />
+    <Compile Include="Contracts\Reporting\CbrSearchSubmittedResponse.cs" />
     <Compile Include="Contracts\Reporting\FailedValidationResult.cs" />
     <Compile Include="Contracts\Reporting\KeyStatus.cs" />
     <Compile Include="Contracts\Reporting\OEMOptionalInfoError.cs" />

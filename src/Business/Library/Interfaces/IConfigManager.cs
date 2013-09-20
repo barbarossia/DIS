@@ -29,6 +29,8 @@ namespace DIS.Business.Library
 
         bool GetCanAutoReport();
 
+        bool GetRequireOHRData();
+
         bool GetIsMsServiceEnabled();
 
         bool GetIsCarbonCopyEnabled();
@@ -56,6 +58,8 @@ namespace DIS.Business.Library
         void UpdateAutoFulfillmentSwitch(bool isAutoFulfillmentOn);
 
         void UpdateAutoReportSwitch(bool isAutoReportOn);
+
+        void UpdateRequireOHRDataSwitch(bool isRequireOHRData);
 
         void UpdateMsServiceEnabledSwitch(bool isMsServiceEnabled);
 

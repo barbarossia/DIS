@@ -29,6 +29,7 @@ using DIS.Presentation.KMT.ViewModel.ControlsViewModel;
 using System.Windows.Controls.Primitives;
 using DIS.Business.Proxy;
 using DIS.Presentation.KMT.Commands;
+using DIS.Data.DataContract;
 
 namespace DIS.Presentation.KMT.Views.EditKeysOptionalInfoView
 {
@@ -46,11 +47,15 @@ namespace DIS.Presentation.KMT.Views.EditKeysOptionalInfoView
         /// 
         /// </summary>
         /// <param name="keyProxy"></param>
-        public EditKeysOptionalInfo(IKeyProxy keyProxy)
+        public EditKeysOptionalInfo(IKeyProxy keyProxy, List<KeyInfo> keys = null, bool allowSearching = true)
         {
             InitializeComponent();
-            VM = new EditKeysOptionalInfoViewModel(keyProxy);
+            VM = new EditKeysOptionalInfoViewModel(keyProxy, keys);
             VM.View = this;
+
+            // Hiden the search context depending on the parameter
+            this.scCBRs.Visibility = allowSearching ? System.Windows.Visibility.Visible : System.Windows.Visibility.Collapsed;
+
             DataContext = VM;
             this.scCBRs.DataContext = VM.SCVM;
         }

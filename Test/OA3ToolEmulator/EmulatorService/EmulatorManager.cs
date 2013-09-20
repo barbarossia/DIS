@@ -194,7 +194,11 @@ namespace EmulatorService
                 optionalInfesSection["ZOemExtId"],
                 optionalInfesSection["ZManufGeoLoc"],
                 optionalInfesSection["ZPgmEligValues"],
-                optionalInfesSection["ZChannelRelId"]).ToString();
+                optionalInfesSection["ZChannelRelId"],
+                optionalInfesSection["zFrmFactorCl1"],
+                optionalInfesSection["zFrmFactorCl2"],
+                optionalInfesSection["zScreenSize"],
+                optionalInfesSection["zTouchScreen"]).ToString();
         }
 
         private string GeneratorHardwareHash(string keyId) {

@@ -16,9 +16,12 @@ using System.Linq;
 using System.Text;
 
 namespace DIS.Data.DataContract {
-    public enum ReturnReportStatus {
+    public enum ReturnReportStatus
+    {
         // Return Key Report was generated, but not been sent
         Generated = 0,
+        // Return Key Report is reporting
+        Sent = 7,
         // Return Key Report was sent and MS GUID was retrieved
         Reported = 1,
         // Return Key Report ack was ready
@@ -29,7 +32,7 @@ namespace DIS.Data.DataContract {
         Failed = 3,
         // Tpi should carbon copy return report data to oem
         ShouldCarbonCopy = 5,
-        //Tpi carbon copy return report data finished
-        CarbonCopyCompleted= 6
+        // Tpi carbon copy return report data finished
+        CarbonCopyCompleted = 6,
     }
 }

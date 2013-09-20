@@ -149,7 +149,7 @@ namespace DIS.Deployment.Custom.DbConnectionTest
         public static ActionResult ConnectDatabase(Session session)
         {
             string connectionString = session[connectionStringSessionName];
-            if (TestConnection(session, connectionString) && AddConstraintForKeyTypeConfiguration(connectionString))
+            if (TestConnection(session, connectionString) && AddConstraintForKeyTypeConfiguration(connectionString) && AddNewOptionInfoForDB(connectionString))
                 session[connectSuccessSessionName] = "0";
             else
                 session[connectSuccessSessionName] = "-1";
@@ -344,6 +344,57 @@ namespace DIS.Deployment.Custom.DbConnectionTest
                 }
             }
             return ActionResult.Success;
+        }
+
+        private static bool AddNewOptionInfoForDB(string connectionString)
+        {
+            try
+            {
+                using (SqlConnection connection = new SqlConnection(connectionString))
+                {
+                    connection.Open();
+                    string sql = string.Join(Environment.NewLine, new string[] {
+                
+                        "IF COLUMNPROPERTY( OBJECT_ID('dbo.ProductKeyInfo'),'ZFRM_FACTOR_CL1','PRECISION') IS NULL ",
+                        "BEGIN",
+                        "      ALTER TABLE ProductKeyInfo  ",
+                        "      ADD [ZFRM_FACTOR_CL1] [nvarchar](64) NULL,",
+                        "          [ZFRM_FACTOR_CL2] [nvarchar](64) NULL,",
+                        "          [ZSCREEN_SIZE] [nvarchar](32) NULL,",
+                         "         [ZTOUCH_SCREEN] [nvarchar](32) NULL",
+                        "END",
+                        "   if (select name from sys.indexes where object_name(object_id)='ProductKeyInfo' and name='IX_ProductKeyInfo_ZFRM_FACTOR_CL1') is NUll   ",
+                        "BEGIN",
+                        "  CREATE NONCLUSTERED INDEX [IX_ProductKeyInfo_ZFRM_FACTOR_CL1] ON [dbo].[ProductKeyInfo](	[ZFRM_FACTOR_CL1] ASC)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]   ",
+                        "END",
+                         "   if (select name from sys.indexes where object_name(object_id)='ProductKeyInfo' and name='IX_ProductKeyInfo_ZFRM_FACTOR_CL2') is NUll   ",
+                        "BEGIN",
+                        "  CREATE NONCLUSTERED INDEX [IX_ProductKeyInfo_ZFRM_FACTOR_CL2] ON [dbo].[ProductKeyInfo](	[ZFRM_FACTOR_CL2] ASC)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]   ",
+                        "END",
+                         "   if (select name from sys.indexes where object_name(object_id)='ProductKeyInfo' and name='IX_ProductKeyInfo_ZSCREEN_SIZE') is NUll   ",
+                        "BEGIN",
+                        "  CREATE NONCLUSTERED INDEX [IX_ProductKeyInfo_ZSCREEN_SIZE] ON [dbo].[ProductKeyInfo](	[ZSCREEN_SIZE] ASC)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]   ",
+                        "END",
+                         "   if (select name from sys.indexes where object_name(object_id)='ProductKeyInfo' and name='IX_ProductKeyInfo_ZTOUCH_SCREEN') is NUll   ",
+                        "BEGIN",
+                        "  CREATE NONCLUSTERED INDEX [IX_ProductKeyInfo_ZTOUCH_SCREEN] ON [dbo].[ProductKeyInfo](	[ZTOUCH_SCREEN] ASC)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]   ",
+                        "END",
+                        "   if not exists (select *from [dbo].[Configuration] where name='IsRequireOHRData' )  ",
+                           "BEGIN",
+                        "    insert Configuration(Name,Value,[Type]) values(N'IsRequireOHRData', '<boolean>false</boolean>', N'System.Boolean')   ",
+                           " END",
+                    });
+                    using (SqlCommand cmd = new SqlCommand(sql, connection))
+                    {
+                        cmd.ExecuteNonQuery();
+                    }
+                }
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
         }
 
         #region Private Functions

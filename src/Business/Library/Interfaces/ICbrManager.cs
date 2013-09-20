@@ -23,6 +23,8 @@ namespace DIS.Business.Library
     {
         List<Cbr> GetCbrsNotBeenSent(bool includeKeyInfo = false);
 
+        Cbr GetFirstSentCbr();
+
         //Cbr already been sent but still not retrive ack
         List<Cbr> GetReportedCbrs();
 
@@ -32,7 +34,11 @@ namespace DIS.Business.Library
 
         Cbr GenerateCbr(List<KeyInfo> keys, bool isExport = false, KeyStoreContext context = null);
 
-        void UpdateCbrAfterReported(Cbr cbr);
+        void UpdateCbrIfSendingFailed(Cbr cbr);
+
+        void UpdateCbrIfSearchResultEmpty(Cbr cbr);
+
+        void UpdateCbrAfterReported(Cbr cbr, KeyStoreContext context);
 
         void UpdateCbrsAfterAckReady(List<Cbr> cbrs);
 

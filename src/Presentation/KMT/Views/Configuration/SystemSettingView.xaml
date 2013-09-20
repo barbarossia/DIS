@@ -81,10 +81,12 @@
                     <ColumnDefinition  Width="180"/>
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
+                    <RowDefinition  Height="auto" />
                     <RowDefinition  Height="40" />
                 </Grid.RowDefinitions>
-                <Label x:Uid="lblOldTimeline" Height="30" Content="{x:Static res:MergedResources.SystemSettingView_OldTimeline}" Style="{DynamicResource LblBoldSty}"/>
-                <TextBox x:Uid="txtOldTimeline" MaxLength="3" Text="{Binding OldTimeLine, UpdateSourceTrigger=PropertyChanged}"  Grid.Column="1" Behaviors:TextBoxFilters.IsNumericFilter="True" Style="{DynamicResource TxtNormalSty}"/>
+                <Label x:Uid="lblOldTimeline" Height="30"    Grid.Row="1" Content="{x:Static res:MergedResources.SystemSettingView_OldTimeline}" Style="{DynamicResource LblBoldSty}" HorizontalAlignment="Stretch" Margin="10,5,0,5"/>
+                <TextBox x:Uid="txtOldTimeline" MaxLength="3"  Grid.Row="1" Text="{Binding OldTimeLine, UpdateSourceTrigger=PropertyChanged}"   Behaviors:TextBoxFilters.IsNumericFilter="True" Style="{DynamicResource TxtNormalSty}" Margin="140,0,0,0"/>
+                <CheckBox x:Uid="chkIsRequireOHRData"  Grid.Row="0" Content="{x:Static res:ResourcesOfRTMv1_6.RequireOHRDataLabel}" IsChecked="{Binding IsRequireOHRData,UpdateSourceTrigger=PropertyChanged}" Style="{DynamicResource ChkLogLevelSty}" Visibility="{Binding IsMsServiceVisible}"></CheckBox>
             </Grid>
         </GroupBox>
     </Grid>

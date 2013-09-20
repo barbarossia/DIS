@@ -24,12 +24,14 @@ namespace DIS.Data.DataAccess.Repository
 
        void InsertReturnReportAndKeys(ReturnReport returnKey);
 
-       void UpdateReturnReport(ReturnReport returnKey);
+       void UpdateReturnReport(ReturnReport returnKey, KeyStoreContext context = null);
 
        void UpdateReturnKeyAck(ReturnReport returnKey, KeyStoreContext context);
 
        ReturnReport GetReturnKey(Guid customerReportUniqueId, KeyStoreContext context);
 
        ReturnReport GetReturnKeyByOneKeyID(long keyId, KeyStoreContext context);
-    }
+
+       ReturnReport GetReturnKeyByCustomerId(Guid customerReportUniqueId);
+   }
 }

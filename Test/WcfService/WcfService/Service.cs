@@ -212,6 +212,31 @@ namespace WcfService
             }
         }
 
+        public CbrSearchSubmittedResponse[] SearchSubmittedCbr(string customerReportUniqueID)
+        {
+            try
+            {
+                Guid guid = Guid.Parse(customerReportUniqueID);
+                var result = db.SearchSubmittedCbr(guid);
+
+                if (result == null)
+                {
+                    var err = new ClientError();
+                    err.ErrorCode = null;
+                    err.ErrorMessage = "No result with given input search parameter(s)";
+                    throw new WebProtocolException(HttpStatusCode.BadRequest, "", err, null);
+                }
+                return result;
+            }
+            catch (Exception ex)
+            {
+                if (ex is WebProtocolException)
+                    throw;
+                else
+                    throw new WebProtocolException(HttpStatusCode.InternalServerError, string.Format("acknowledgements?reportUniqueid={reportUniqueID}&Status={status}"), ex);
+            }
+        }
+
         #endregion
 
         #region Return report
@@ -262,6 +287,27 @@ namespace WcfService
                     throw;
                 else
                     throw new WebProtocolException(HttpStatusCode.InternalServerError, string.Format("RetrieveReportReturn"), ex);
+            }
+        }
+
+        public ReturnSearchSubmittedResponse[] SearchSubmittedReturn(string oemRMANumber, DateTime oemRMADateUTC)
+        {
+            try
+            {
+                var ack = db.SearchSubmittedReturn(oemRMANumber, oemRMADateUTC);
+                if (ack == null)
+                    throw new WebProtocolException(HttpStatusCode.BadRequest, 
+                        "", 
+                        new ClientError { ErrorCode = null, ErrorMessage = "No result with given input search parameter(s)" }, 
+                        null);
+                return ack;
+            }
+            catch (Exception ex)
+            {
+                if (ex is WebProtocolException)
+                    throw;
+                else
+                    throw new WebProtocolException(HttpStatusCode.InternalServerError, string.Format("BindingReport/acknowledgements"), ex);
             }
         }
 

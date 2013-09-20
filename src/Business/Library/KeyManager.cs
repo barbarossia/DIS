@@ -288,6 +288,13 @@ namespace DIS.Business.Library
             if (keyState != KeyState.Bound && keyState != KeyState.Returned)
                 throw new NotSupportedException(string.Format("oa3tool.exe to {0} is not supported", keyState));
 
+            if (keyState == KeyState.Returned)
+            {
+                var keyInDb = GetKeysInDb(new[] { key }).First();
+                if (keyInDb.KeyInfoEx.IsInProgress == true)
+                    throw new NotSupportedException(string.Format("key {0} has in progress", key.KeyId));
+            }
+
             try
             {
                 bool isBound = keyState == KeyState.Bound;
@@ -379,6 +386,7 @@ namespace DIS.Business.Library
         private KeySearchCriteria GetRecallKeySearchCriteria(KeySearchCriteria criteria)
         {
             criteria.KeyState = KeyState.Fulfilled;
+            criteria.IsInProgress = false;
             criteria.HqId = CurrentHeadQuarterId; ;
             return ConvertSearchCriteria(criteria);
         }

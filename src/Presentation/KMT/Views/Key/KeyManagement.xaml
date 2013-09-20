@@ -63,6 +63,15 @@
                         <TextBox x:Uid="txtZPGM_ELIG_VALUES" Margin="10,2,5,2" x:Name="txtZPGM_ELIG_VALUES" Text="{Binding ZPGM_ELIG_VALUES, Mode=TwoWay}"  MaxLength="48" Style="{StaticResource TxtNormalSty}"/>
                         <Label x:Uid="lblZCHANNEL_REL_ID" Content="{x:Static res:MergedResources.EditOptionalInfo_ChaRelId}" Style="{StaticResource LblNormalSty}"/>
                         <TextBox x:Uid="txtZCHANNEL_REL_ID" Margin="10,2,5,2" x:Name="txtZCHANNEL_REL_ID" Text="{Binding ZCHANNEL_REL_ID, Mode=TwoWay}"  MaxLength="32" Behaviors:TextBoxFilters.IsAlphaNumericFilter="True" Style="{StaticResource TxtNormalSty}"/>
+
+                        <Label x:Uid="lblFactor1" Content="{x:Static res:ResourcesOfRTMv1_6.EditOptionalInfo_Factor1Name}" Style="{StaticResource LblNormalSty}"/>
+                        <ComboBox  x:Uid="cbFrmactor1"  x:Name="drpFactor1" ItemsSource="{Binding ZFRM_FACTOR_CL1s}" SelectedItem="{Binding SelectedZFRM_FACTOR_CL1, Mode=TwoWay}" Style="{StaticResource CboNormalSty}"  MinWidth="180" FontSize="12"  Margin="10,2,5,2"/>
+                        <Label x:Uid="lblFrmFactor2" Content="{x:Static res:ResourcesOfRTMv1_6.EditOptionalInfo_Factor2Name}" Style="{StaticResource LblNormalSty}"/>
+                        <ComboBox  x:Uid="cbFrmFactor2"  x:Name="drpFactor2"  ItemsSource="{Binding ZFRM_FACTOR_CL2s}" SelectedItem="{Binding SelectedZFRM_FACTOR_CL2, Mode=TwoWay}" Style="{StaticResource CboNormalSty}" MinWidth="180" FontSize="12" Margin="10,2,5,2"/>
+                        <Label x:Uid="lblzScreenSize" Content="{x:Static res:ResourcesOfRTMv1_6.EditOptionalInfo_ScreenSizeName}" Style="{StaticResource LblNormalSty}"/>
+                        <TextBox x:Uid="txtzScreenSize" Margin="10,2,5,2" x:Name="txtzScreenSize" Text="{Binding ZSCREEN_SIZE, Mode=TwoWay}"  MaxLength="32" Behaviors:TextBoxFilters.IsAlphaNumericFilter="True" Style="{StaticResource TxtNormalSty}"/>
+                        <Label x:Uid="lblzTouchScreen" Content="{x:Static res:ResourcesOfRTMv1_6.EditOptionalInfo_TouchScreenName}" Style="{StaticResource LblNormalSty}"/>
+                        <ComboBox  x:Uid="cbotouchScreen"  x:Name="drpTouchScreen" Margin="10,2,5,2"   ItemsSource="{Binding ZTOUCH_SCREENs}" SelectedItem="{Binding SelectedZTOUCH_SCREEN, Mode=TwoWay}" Style="{StaticResource CboNormalSty}" MinWidth="180" FontSize="12"/>
                         <Label x:Uid="lblTrakingInfo" Content="{x:Static res:MergedResources.Common_TrackingInfo}" Style="{StaticResource LblNormalSty}"/>
                         <TextBox x:Uid="txtTrakingInfo" Margin="10,2,5,2" x:Name="txtTrakingInfo" Text="{Binding TrakingInfo, Mode=TwoWay}" Style="{StaticResource TxtNormalSty}"/>
                     </StackPanel>

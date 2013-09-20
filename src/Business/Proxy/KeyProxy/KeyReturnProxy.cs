@@ -23,14 +23,56 @@ namespace DIS.Business.Proxy
 {
     public partial class KeyProxy
     {
-        //re-send return failed keys in the background
-        public void SendGeneratedReturnReports()
+        private void SearchSubmittedReturnReport()
         {
-            base.SendReturnReports((l) => msClient.ReportReturn(l));
+            ReturnReport returnReport = GetFirstSentReturnReport();
+            if (returnReport != null)
+            {
+                ReturnReport submittedReturnReport = msClient.SearchSubmittedReturn(returnReport);
+                if (submittedReturnReport == null)
+                {
+                    UpdateReturnReportIfSearchResultEmpty(returnReport);
+                }
+                else
+                {
+                    returnReport.ReturnUniqueId = submittedReturnReport.ReturnUniqueId;
+                    returnReport.ReturnDateUTC = submittedReturnReport.ReturnDateUTC;
+                    UpdateReturnReportAfterReported(returnReport);
+                }
+            }
+        }
+
+        //re-send return failed keys in the background
+        private void SendGeneratedReturnReports()
+        {
+            List<ReturnReport> returnReports = GetReturnReportsNotSent();
+            foreach (ReturnReport returnReport in returnReports)
+            {
+                try
+                {
+                    returnReport.ReturnUniqueId = msClient.ReportReturn(returnReport);
+                    UpdateReturnReportAfterReported(returnReport);
+                }
+                catch (Exception ex)
+                {
+                    UpdateReturnReportIfSendingFailed(returnReport);
+                    ExceptionHandler.HandleException(ex);
+                }
+            }
+        }
+
+        private void UpdateReturnReportAfterReported(ReturnReport returnReport)
+        {
+            using (KeyStoreContext context = KeyStoreContext.GetContext())
+            {
+                UpdateReturnAfterReported(returnReport, context);
+                UpdateKeysAfterReturnReport(returnReport.ReturnReportKeys, context);
+                context.SaveChanges();
+            }
         }
 
         //get Return.Ack from Ms 
-        public void RetrieveReturnReportAcks()
+        private void RetrieveReturnReportAcks()
         {
             List<ReturnReport> returnReports = GetReportedReturnReports()
                 .Where(c => c.ReturnUniqueId.HasValue).ToList();

@@ -56,7 +56,7 @@ namespace DIS.Business.Proxy
 
         List<KeyOperationResult> SendBoundKeys(List<KeyGroup> groupKeys);
 
-        void RetrieveReturnReportAcks();
+        void ReceiveSyncNotification(List<KeyInfo> keys);
 
         #endregion
 
@@ -64,15 +64,9 @@ namespace DIS.Business.Proxy
 
         List<Cbr> GetCbrsDuplicated();
 
-        void SendGeneratedCbrs();
-
-        void RetrieveCbrAcks();
-
         List<Cbr> GetFailedCbrs();
 
         #endregion
-
-        void SendGeneratedReturnReports();
 
         #region offline import/export keyfile
 
@@ -118,6 +112,10 @@ namespace DIS.Business.Proxy
 
         void DoRecurringTasks();
 
+        void SearchSubmitted();
+
         #endregion
+
+        List<KeyInfo> GetBoundKeysWithoutOhrData();
     }
 }

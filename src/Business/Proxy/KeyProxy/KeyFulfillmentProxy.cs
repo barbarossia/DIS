@@ -51,14 +51,21 @@ namespace DIS.Business.Proxy
                     break;
 
                 total += info.Keys.Count;
-                using (KeyStoreContext context = KeyStoreContext.GetContext())
+                try
                 {
-                    if (info.Keys.Count > 0)
-                        base.SaveKeysAfterGetting(info.Keys, false, shouldBeCarbonCopy, context);
+                    using (KeyStoreContext context = KeyStoreContext.GetContext())
+                    {
+                        if (info.Keys.Count > 0)
+                            base.SaveKeysAfterGetting(info.Keys, false, shouldBeCarbonCopy, context);
 
-                    fulfillManager.UpdateFulfillmentToCompleted(info, context);
+                        fulfillManager.UpdateFulfillmentToCompleted(info, context);
 
-                    context.SaveChanges();
+                        context.SaveChanges();
+                    }
+                }
+                catch (Exception)
+                {
+                    throw;
                 }
             }
             return total;
@@ -75,6 +82,14 @@ namespace DIS.Business.Proxy
 
             int count = base.GetAndSaveKeys(ulsClient.GetKeys, keysToSync => ulsClient.SyncKeys(keysToSync));
             return count;
+        }
+
+        public new void ReceiveSyncNotification(List<KeyInfo> keys)
+        {
+            var result = base.ReceiveSyncNotification(keys);
+            if (GetIsCarbonCopy())
+                base.UpdateKeysToCarbonCopy(
+                    result.Where(r => !r.Failed && r.Key.KeyInfoEx.KeyType == KeyType.MBR).Select(r => r.Key).ToList(), true);
         }
 
         public void AutomaticGetKeys()

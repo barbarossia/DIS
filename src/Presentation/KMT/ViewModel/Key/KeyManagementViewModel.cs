@@ -68,6 +68,15 @@ namespace DIS.Presentation.KMT.ViewModel
         private string zmauf_geo_loc = string.Empty;
         private string zpgm_elig_values = string.Empty;
         private string zchannel_rel_id = string.Empty;
+        //add for V1.6
+        private List<string> zfrm_factor_cl1s;
+        private List<string> zfrm_factor_cl2s;
+        private string selectedzfrm_factor_cl1;
+        private string selectedzfrm_factor_cl2;
+        private string zscreen_size;
+        private List<string> ztouch_screens;
+        private string selectedztouch_screen;
+
         private string trakingInfo = string.Empty;
         private DateTime? startChangeStateDate = null;
         private DateTime? endChangeStateDate = null;
@@ -134,6 +143,10 @@ namespace DIS.Presentation.KMT.ViewModel
                 LoadSubSidiary();
                 LoadKeyTypesList();
                 LoadKeyRetuernState();
+                LoadZfactorCl1s();
+                LoadZfactorCl2s(null);
+                this.selectedzfrm_factor_cl2 = this.zfrm_factor_cl2s.FirstOrDefault();
+                LoadZtouchScerrens();
             });
         }
 
@@ -890,6 +903,73 @@ namespace DIS.Presentation.KMT.ViewModel
             }
         }
 
+        public List<string> ZFRM_FACTOR_CL1s
+        {
+            get { return this.zfrm_factor_cl1s; }
+        }
+        public List<string> ZFRM_FACTOR_CL2s
+        {
+            get { return this.zfrm_factor_cl2s; }
+        }
+
+        public string SelectedZFRM_FACTOR_CL1
+        {
+            get
+            {
+                return this.selectedzfrm_factor_cl1;
+            }
+            set
+            {
+                this.selectedzfrm_factor_cl1 = value;
+                LoadZfactorCl2s(value);
+                RaisePropertyChanged("SelectedZFRM_FACTOR_CL1");
+                RaisePropertyChanged("ZFRM_FACTOR_CL2s");
+                this.selectedzfrm_factor_cl2 = zfrm_factor_cl2s.FirstOrDefault();
+                RaisePropertyChanged("SelectedZFRM_FACTOR_CL2");
+            }
+        }
+
+        public string SelectedZFRM_FACTOR_CL2
+        {
+            get
+            {
+                return this.selectedzfrm_factor_cl2;
+            }
+            set
+            {
+                this.selectedzfrm_factor_cl2 = value;
+                RaisePropertyChanged("SelectedZFRM_FACTOR_CL2");
+            }
+        }
+        public string ZSCREEN_SIZE
+        {
+            get { return this.zscreen_size; }
+            set
+            {
+                if (string.IsNullOrEmpty(value))
+                    this.zscreen_size = null;
+                else
+                    this.zscreen_size = value;
+                RaisePropertyChanged("ZSCREEN_SIZE");
+            }
+        }
+
+        public List<string> ZTOUCH_SCREENs
+        {
+            get { return this.ztouch_screens; }
+        }
+        public string SelectedZTOUCH_SCREEN
+        {
+            get
+            {
+                return this.selectedztouch_screen;
+            }
+            set
+            {
+                this.selectedztouch_screen = value;
+                RaisePropertyChanged("SelectedZTOUCH_SCREEN");
+            }
+        }
         /// <summary>
         /// 
         /// </summary>
@@ -1119,6 +1199,10 @@ namespace DIS.Presentation.KMT.ViewModel
                         searchCriteria.ZMAUF_GEO_LOC = ZMAUF_GEO_LOC;
                         searchCriteria.ZOEM_EXT_ID = ZOEM_EXT_ID;
                         searchCriteria.ZPGM_ELIG_VALUES = ZPGM_ELIG_VALUES;
+                        searchCriteria.ZFRM_FACTOR_CL1 = this.SelectedZFRM_FACTOR_CL1 == "All" ? string.Empty : this.SelectedZFRM_FACTOR_CL1;
+                        searchCriteria.ZFRM_FACTOR_CL2 = this.SelectedZFRM_FACTOR_CL2 == "All" ? string.Empty : this.SelectedZFRM_FACTOR_CL2;
+                        searchCriteria.ZSCREEN_SIZE = ZSCREEN_SIZE;
+                        searchCriteria.ZTOUCH_SCREEN = this.SelectedZTOUCH_SCREEN == "All" ? string.Empty : this.SelectedZTOUCH_SCREEN;
                         searchCriteria.TrakingInfo = TrakingInfo;
                         searchCriteria.ShouldIncludeReturnReport = true;
                         searchCriteria.OemRmaNumber = OemRmaNumber;
@@ -1214,6 +1298,12 @@ namespace DIS.Presentation.KMT.ViewModel
                 KeysDetailsValueCollection.Add(MergedResources.EditOptionalInfo_ManGeo, keySelected.keyInfo.ZMANUF_GEO_LOC);
                 KeysDetailsValueCollection.Add(MergedResources.EditOptionalInfo_ProEligValue, keySelected.keyInfo.ZPGM_ELIG_VALUES);
                 KeysDetailsValueCollection.Add(MergedResources.EditOptionalInfo_ChaRelId, keySelected.keyInfo.ZCHANNEL_REL_ID);
+
+                KeysDetailsValueCollection.Add(ResourcesOfRTMv1_6.EditOptionalInfo_Factor1Name, keySelected.keyInfo.ZFRM_FACTOR_CL1);
+                KeysDetailsValueCollection.Add(ResourcesOfRTMv1_6.EditOptionalInfo_Factor2Name, keySelected.keyInfo.ZFRM_FACTOR_CL2);
+                KeysDetailsValueCollection.Add(ResourcesOfRTMv1_6.EditOptionalInfo_ScreenSizeName, keySelected.keyInfo.ZSCREEN_SIZE);
+                KeysDetailsValueCollection.Add(ResourcesOfRTMv1_6.EditOptionalInfo_TouchScreenName, keySelected.keyInfo.ZTOUCH_SCREEN);
+
                 KeysDetailsValueCollection.Add(MergedResources.Common_TrackingInfo, keySelected.keyInfo.TrackingInfo);
                 KeysDetailsValueCollection.Add(MergedResources.UserManagement_CreatedDate, keySelected.keyInfo.CreatedDate.ToString());
                 KeysDetailsValueCollection.Add(ResourcesOfR6.ReturnKeysView_OEMRMANumber, keySelected.keyInfo.ReturnReportKeys.Count > 0 ? keySelected.keyInfo.ReturnReportKeys.Last().ReturnReport.OemRmaNumber : "");
@@ -1226,11 +1316,10 @@ namespace DIS.Presentation.KMT.ViewModel
             }
         }
 
-        private Tuple<string,string> GetKeyInfoReturnReport(KeyInfoModel keySelected)
+        private Tuple<string, string> GetKeyInfoReturnReport(KeyInfoModel keySelected)
         {
             var lastReturnReport = keySelected.keyInfo.ReturnReportKeys
                 .Select(k => k.ReturnReport)
-                .Where(r => r.ReturnReportStatus == ReturnReportStatus.Completed)
                 .OrderByDescending(r => r.ReturnDateUTC)
                 .FirstOrDefault();
 
@@ -1570,6 +1659,33 @@ namespace DIS.Presentation.KMT.ViewModel
             DisableGetKeys = -4,
         }
 
+        private void LoadZfactorCl1s()
+        {
+            List<string> lists = new List<string>();
+            lists.Add("All");
+            OHRData.ZFRM_FACTORValue.Select(k => k.Key).ToList().ForEach(k => { lists.Add(k); });
+            this.zfrm_factor_cl1s = lists;
+            this.selectedzfrm_factor_cl1 = lists.FirstOrDefault();
+        }
+
+        private void LoadZfactorCl2s(string factor1value)
+        {
+            List<string> lists = new List<string>();
+            lists.Add("All");
+            if (!string.IsNullOrEmpty(factor1value) && factor1value != "All")
+                OHRData.ZFRM_FACTORValue.Where(k => k.Key == factor1value).FirstOrDefault().Value.ForEach(k => { lists.Add(k); });
+            this.zfrm_factor_cl2s = lists;
+        }
+
+        private void LoadZtouchScerrens()
+        {
+            List<string> lists = new List<string>();
+            lists.Add("All");
+            OHRData.ZTOUCH_SCREENValue.ForEach(k => lists.Add(k));
+            this.ztouch_screens = lists;
+            this.selectedztouch_screen = lists.FirstOrDefault();
+        }
+
         private void Clear()
         {
             OrderNumber = string.Empty;
@@ -1586,6 +1702,10 @@ namespace DIS.Presentation.KMT.ViewModel
             ZOEM_EXT_ID = string.Empty;
             ZPC_MODEL_SKU = string.Empty;
             ZPGM_ELIG_VALUES = string.Empty;
+            SelectedZFRM_FACTOR_CL1 = ZFRM_FACTOR_CL1s.FirstOrDefault();
+            SelectedZFRM_FACTOR_CL2 = ZFRM_FACTOR_CL2s.FirstOrDefault();
+            ZSCREEN_SIZE = string.Empty;
+            SelectedZTOUCH_SCREEN = ZTOUCH_SCREENs.FirstOrDefault();
             HardWareHash = string.Empty;
             TrakingInfo = string.Empty;
             SelectedKeyState = KeyStatus.FirstOrDefault();

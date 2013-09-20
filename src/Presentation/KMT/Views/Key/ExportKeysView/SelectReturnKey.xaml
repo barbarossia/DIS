@@ -22,8 +22,8 @@
             <RowDefinition Height="auto"/>
         </Grid.RowDefinitions>
         <my:SearchControl x:Name="searchControl" Grid.Row="0" x:Uid="searchControl" CbStateVisibility="Visible"/>
-        <my:ReturnKeysListControl x:Name="returnKeysListControl" x:Uid="returnKeysListControl" Grid.Row="1"/>
-        <StackPanel  Grid.Row="4" VerticalAlignment="Top" Margin="0,8,0,0" Orientation="Horizontal" >
+        <my:ReturnKeysListControl x:Name="returnKeysListControl" x:Uid="returnKeysListControl" Grid.Row="1" />
+        <StackPanel  Grid.Row="4" VerticalAlignment="Top" Margin="0,0,0,0" Orientation="Horizontal" >
             <Label x:Uid="lblExistingMsg"  Content="{Binding FileLabelTxt}" Style="{StaticResource LblNormalSty}"/>
             <TextBox x:Uid="txtFile"  Margin="4,0,0,0" x:Name="txtFile" Text="{Binding FileName}" Style="{StaticResource TxtFileLocationSty}" Width="450"  />
             <Button x:Uid="btnBrowse" Margin="10,0,0,0" Content="{x:Static res:MergedResources.Common_Browse}" Command="{Binding BrowseCommand}" Style="{StaticResource BtnNormalSty}"/>

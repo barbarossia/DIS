@@ -69,6 +69,12 @@ namespace DIS.Services.TransferWebService
                 serviceClient.ReportCbr(request));
         }
 
+        public Cbr SearchSubmittedCbr(Cbr cbr)
+        {
+            return HandleException<Cbr>(MessageLogger.GetMethodName(), () =>
+                serviceClient.SearchSubmittedCbr(cbr));
+        }
+
         public Guid[] RetrieveCbrAcks()
         {
             return HandleException<Guid[]>(MessageLogger.GetMethodName(), () =>
@@ -85,6 +91,12 @@ namespace DIS.Services.TransferWebService
         {
             return HandleException<Guid>(MessageLogger.GetMethodName(), () =>
                 serviceClient.ReportReturn(request));
+        }
+
+        public ReturnReport SearchSubmittedReturn(ReturnReport returnReport)
+        {
+            return HandleException<ReturnReport>(MessageLogger.GetMethodName(), () =>
+                serviceClient.SearchSubmittedReturn(returnReport));
         }
 
         public Guid[] RetrieveReturnAcks()

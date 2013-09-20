@@ -92,6 +92,14 @@ namespace DIS.Data.DataContract
 
         public string ZCHANNEL_REL_ID { get; set; }
 
+        public string ZFRM_FACTOR_CL1 { get; set; }
+
+        public string ZFRM_FACTOR_CL2 { get; set; }
+
+        public string ZSCREEN_SIZE { get; set; }
+
+        public string ZTOUCH_SCREEN { get; set; }
+
         public string TrakingInfo { get; set; }
 
         public string OemRmaNumber { get; set; }
@@ -133,6 +141,8 @@ namespace DIS.Data.DataContract
         public bool? ShouldCarbonCopy { get; set; }
 
         public bool ShouldIncludeReturnReport { get; set; }
+
+        public bool? HasOhrData { get; set; }
 
         public KeySearchCriteria()
         {

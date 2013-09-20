@@ -40,7 +40,15 @@ namespace DIS.Services.ProviderWebService
         {
             identity = GetIdentity();
             cfgProxy = new ConfigProxy(null);
-            keyProxy = new KeyProxy(null, null);
+            var defaultHeadQuarter = new HeadQuarterProxy().GetHeadQuarters().FirstOrDefault();
+            if (defaultHeadQuarter != null)
+            {
+                keyProxy = new KeyProxy(null, defaultHeadQuarter.HeadQuarterId);
+            }
+            else
+            {
+                keyProxy = new KeyProxy(null, null);
+            }
             ssProxy = new SubsidiaryProxy();
         }
 

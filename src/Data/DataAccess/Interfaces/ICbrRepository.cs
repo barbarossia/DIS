@@ -24,7 +24,7 @@ namespace DIS.Data.DataAccess.Repository
 
         void InsertCbrAndCbrKeys(Cbr cbr, KeyStoreContext context = null);
 
-        void UpdateCbr(Cbr cbr);
+        void UpdateCbr(Cbr cbr, KeyStoreContext context = null);
 
         void UpdateCbrAck(Cbr cbr, bool IsDuplicateImport = false, KeyStoreContext context = null);
 

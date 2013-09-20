@@ -31,7 +31,13 @@ namespace DIS.Business.Proxy
                     return base.ExportCbr(exportParameters,
                         k => cbrManager.GenerateCbrToFile(k, exportParameters.OutputPath));
                 case Constants.ExportType.FulfilledKeys:
-                    return base.ExportFulfilledKeys(exportParameters);
+                    {
+                        var exportKeys = base.ExportFulfilledKeys(exportParameters);
+                        if (GetIsCarbonCopy())
+                            base.UpdateKeysToCarbonCopy(
+                                exportKeys.Where(r => !r.Failed && r.KeyInDb.KeyInfoEx.KeyType == KeyType.MBR).Select(r => r.KeyInDb).ToList(), true);
+                        return exportKeys;
+                    }
                 case Constants.ExportType.ReportKeys:
                     return base.ExportBoundKeys(exportParameters);
                 case Constants.ExportType.ToolKeys:

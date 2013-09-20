@@ -80,12 +80,18 @@ namespace DIS.Business.Library {
                     fulfillRepository.UpdateFulfillment(info);
                 }
                 catch (Exception ex) {
-                    if (ex is WebProtocolException) {
+                    if (ex is WebProtocolException)
+                    {
                         info.FulfillmentStatus = FulfillmentStatus.Failed;
                         fulfillRepository.UpdateFulfillment(info);
                         MessageLogger.LogSystemRunning("Fulfillment Failed", string.Format(
                             "Fulfillment {0} has failed at {1}. Please contact Microsoft and request a re-fulfillment.",
                             info.FulfillmentNumber, DateTime.Now.ToString()));
+                    }
+                    else
+                    {
+                        info.FulfillmentStatus = FulfillmentStatus.Ready;
+                        fulfillRepository.UpdateFulfillment(info);
                     }
                     ExceptionHandler.HandleException(ex);
                 }

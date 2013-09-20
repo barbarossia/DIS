@@ -43,6 +43,15 @@ namespace DIS.Presentation.KMT.ViewModel.Key
         private string zmauf_geo_loc;
         private string zpgm_elig_values;
         private string zchannel_rel_id;
+        //add for V1.6
+        private List<string> zfrm_factor_cl1s;
+        private List<string> zfrm_factor_cl2s;
+        private string selectedzfrm_factor_cl1;
+        private string selectedzfrm_factor_cl2;
+        private string zscreen_size;
+        private List<string> ztouch_screens;
+        private string selectedztouch_screen;
+
         private bool isBusy;
         private bool canEdit;
         private KeyInfoModel selectedKey;
@@ -57,14 +66,24 @@ namespace DIS.Presentation.KMT.ViewModel.Key
         /// <summary>
         /// 
         /// </summary>
-        public EditKeysOptionalInfoViewModel(IKeyProxy keyProxy)
+        public EditKeysOptionalInfoViewModel(IKeyProxy keyProxy, List<KeyInfo> keys)
         {
             this.keyProxy = keyProxy;
-
+            LoadZfactorCl1s();
+            LoadZtouchScerrens();
             SCVM = new SearchControlViewModel();
             SCVM.KeyTypesVisibility = Visibility.Collapsed;
             SCVM.SearchKeys += new EventHandler(SearchKeys);
             SearchKeys(null, null);
+
+            if (keys != null)
+            {
+                Keys.Clear();
+                foreach (var m in keys.ToKeyInfoModel())
+                {
+                    Keys.Add(m);
+                }
+            }
         }
 
         #region public property
@@ -125,7 +144,7 @@ namespace DIS.Presentation.KMT.ViewModel.Key
             set
             {
                 this.selectedKey = value;
-                this.InitOptionalInfo(selectedKey.keyInfo);
+                this.InitOptionalInfo(selectedKey == null ? null : selectedKey.keyInfo);
                 RaisePropertyChanged("SelectedKey");
             }
         }
@@ -252,6 +271,66 @@ namespace DIS.Presentation.KMT.ViewModel.Key
             }
         }
 
+        public List<string> ZFRM_FACTOR_CL1s
+        {
+            get { return this.zfrm_factor_cl1s; }
+        }
+        public List<string> ZFRM_FACTOR_CL2s
+        {
+            get { return this.zfrm_factor_cl2s; }
+        }
+
+        public string SelectedZFRM_FACTOR_CL1
+        {
+            get { return this.selectedzfrm_factor_cl1; }
+            set
+            {
+                this.selectedzfrm_factor_cl1 = value;
+                LoadZfactorCl2s(value);
+                RaisePropertyChanged("SelectedZFRM_FACTOR_CL1");
+                RaisePropertyChanged("ZFRM_FACTOR_CL2s");
+
+            }
+        }
+
+        public string SelectedZFRM_FACTOR_CL2
+        {
+            get { return this.selectedzfrm_factor_cl2; }
+            set
+            {
+                this.selectedzfrm_factor_cl2 = value;
+                RaisePropertyChanged("SelectedZFRM_FACTOR_CL2");
+            }
+        }
+
+        public string ZSCREEN_SIZE
+        {
+            get { return this.zscreen_size; }
+            set
+            {
+                if (string.IsNullOrEmpty(value))
+                    this.zscreen_size = null;
+                else
+                    this.zscreen_size = value;
+                RaisePropertyChanged("ZSCREEN_SIZE");
+            }
+        }
+
+        public List<string> ZTOUCH_SCREENs
+        {
+            get { return this.ztouch_screens; }
+        }
+        public string SelectedZTOUCH_SCREEN
+        {
+            get { return this.selectedztouch_screen; }
+            set
+            {
+                this.selectedztouch_screen = value;
+                RaisePropertyChanged("SelectedZTOUCH_SCREEN");
+            }
+        }
+
+
         /// <summary>
         /// 
         /// </summary>
@@ -363,6 +442,11 @@ namespace DIS.Presentation.KMT.ViewModel.Key
                 this.ZOEM_EXT_ID = key.ZOEM_EXT_ID;
                 this.ZPC_MODEL_SKU = key.ZPC_MODEL_SKU;
                 this.ZPGM_ELIG_VALUES = key.ZPGM_ELIG_VALUES;
+
+                this.SelectedZFRM_FACTOR_CL1 = key.ZFRM_FACTOR_CL1;
+                this.SelectedZFRM_FACTOR_CL2 = key.ZFRM_FACTOR_CL2;
+                this.ZSCREEN_SIZE = key.ZSCREEN_SIZE;
+                this.SelectedZTOUCH_SCREEN = key.ZTOUCH_SCREEN;
             }
         }
 
@@ -385,12 +469,18 @@ namespace DIS.Presentation.KMT.ViewModel.Key
                         optionalInfo.ZOEM_EXT_ID = string.IsNullOrEmpty(ZOEM_EXT_ID) ? null : ZOEM_EXT_ID;
                         optionalInfo.ZPC_MODEL_SKU = string.IsNullOrEmpty(ZPC_MODEL_SKU) ? null : ZPC_MODEL_SKU;
                         optionalInfo.ZPGM_ELIG_VALUES = string.IsNullOrEmpty(ZPGM_ELIG_VALUES) ? null : ZPGM_ELIG_VALUES;
+
+                        optionalInfo.ZFRM_FACTOR_CL1 = string.IsNullOrEmpty(SelectedZFRM_FACTOR_CL1) ? null : SelectedZFRM_FACTOR_CL1;
+                        optionalInfo.ZFRM_FACTOR_CL2 = string.IsNullOrEmpty(SelectedZFRM_FACTOR_CL2) ? null : SelectedZFRM_FACTOR_CL2;
+                        optionalInfo.ZSCREEN_SIZE = string.IsNullOrEmpty(ZSCREEN_SIZE) ? null : ZSCREEN_SIZE;
+                        optionalInfo.ZTOUCH_SCREEN = string.IsNullOrEmpty(SelectedZTOUCH_SCREEN) ? null : SelectedZTOUCH_SCREEN;
                         string result = UpdateOptionalInfo();
                         MessageLogger.LogOperation(KmtConstants.LoginUser.LoginId,
-                           string.Format("CBR's Oem Optional information was changed, " +
-                                         " ZCHANNEL_REL_ID:{0}, ZMAUF_GEO_LOC:{1}, ZOEM_EXT_ID:{2}, ZPC_MODEL_SKU:{3} ," +
-                                         " ZPGM_ELIG_VALUES:{4} ",
-                               this.ZCHANNEL_REL_ID, this.ZMAUF_GEO_LOC, this.ZOEM_EXT_ID, this.ZPC_MODEL_SKU, this.ZPGM_ELIG_VALUES));
+                          string.Format("CBR's Oem Optional information was changed, " +
+                                        " ZCHANNEL_REL_ID:{0}, ZMAUF_GEO_LOC:{1}, ZOEM_EXT_ID:{2}, ZPC_MODEL_SKU:{3} ," +
+                                        " ZPGM_ELIG_VALUES:{4},ZFRM_FACTOR_CL1:{5},ZFRM_FACTOR_CL2:{6},ZSCREEN_SIZE:{7},ZTOUCH_SCREEN:{8} ",
+                              this.ZCHANNEL_REL_ID, this.ZMAUF_GEO_LOC, this.ZOEM_EXT_ID, this.ZPC_MODEL_SKU, this.ZPGM_ELIG_VALUES, this.SelectedZFRM_FACTOR_CL1,
+                              this.SelectedZFRM_FACTOR_CL2, this.ZSCREEN_SIZE, this.SelectedZTOUCH_SCREEN));
                         Dispatch(() =>
                         {
                             if (result != null)
@@ -434,6 +524,31 @@ namespace DIS.Presentation.KMT.ViewModel.Key
             }
         }
 
+        private void LoadZfactorCl1s()
+        {
+            List<string> lists = new List<string>();
+            lists.Add(string.Empty);
+            OHRData.ZFRM_FACTORValue.Select(k => k.Key).ToList().ForEach(k => { lists.Add(k); });
+            this.zfrm_factor_cl1s = lists;
+        }
+
+        private void LoadZfactorCl2s(string factor1value)
+        {
+            List<string> lists = new List<string>();
+            lists.Add(string.Empty);
+            if (!string.IsNullOrEmpty(factor1value))
+                OHRData.ZFRM_FACTORValue.Where(k => k.Key == factor1value).FirstOrDefault().Value.ForEach(k => { lists.Add(k); });
+            this.zfrm_factor_cl2s = lists;
+        }
+
+        private void LoadZtouchScerrens()
+        {
+            List<string> lists = new List<string>();
+            lists.Add(string.Empty);
+            OHRData.ZTOUCH_SCREENValue.ForEach(k => lists.Add(k));
+            this.ztouch_screens = lists;
+        }
+
         private void Clear()
         {
             this.ZCHANNEL_REL_ID = null;
@@ -441,6 +556,11 @@ namespace DIS.Presentation.KMT.ViewModel.Key
             this.ZOEM_EXT_ID = null;
             this.ZPC_MODEL_SKU = null;
             this.ZPGM_ELIG_VALUES = null;
+
+            this.SelectedZFRM_FACTOR_CL1 = string.Empty;
+            this.SelectedZFRM_FACTOR_CL2 = string.Empty;
+            this.ZSCREEN_SIZE = null;
+            this.SelectedZTOUCH_SCREEN = string.Empty;
         }
 
         private bool ValidateOptionalInfo()
@@ -455,6 +575,12 @@ namespace DIS.Presentation.KMT.ViewModel.Key
             {
                 ValidationHelper.ShowMessageBox(error, Properties.MergedResources.Common_Error);
                 return false;
+            }
+            if (Keys.Where(k => k.IsSelected).Any(k => k.keyInfo.OemOptionalInfo.HasOHRData))
+            {
+                MessageBoxResult confirm = System.Windows.MessageBox.Show(ResourcesOfRTMv1_6.EditOptionalInfo_OverWriteOHRDataMsg, MergedResources.Common_Confirmation, MessageBoxButton.OKCancel);
+                if (confirm != MessageBoxResult.OK)
+                    return false;
             }
             return true;
         }

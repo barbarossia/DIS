@@ -50,13 +50,12 @@ namespace DIS.Data.DataAccess.Repository
             }
         }
 
-        public void UpdateReturnReport(ReturnReport returnKey)
+        public void UpdateReturnReport(ReturnReport returnKey, KeyStoreContext context = null)
         {
-            using (var context = GetContext())
+            UsingContext(ref context, () =>
             {
                 UpdateReturnKeyAck(context, returnKey);
-                context.SaveChanges();
-            }
+            });
         }
 
         public void UpdateReturnKeyAck(ReturnReport returnKey, KeyStoreContext context)
@@ -77,6 +76,14 @@ namespace DIS.Data.DataAccess.Repository
         public ReturnReport GetReturnKey(Guid customerReportUniqueId, KeyStoreContext context)
         {
             return context.ReturnReports.Include("ReturnReportKeys").Where(r => r.ReturnUniqueId == customerReportUniqueId).SingleOrDefault();
+        }
+
+        public ReturnReport GetReturnKeyByCustomerId(Guid customerReportUniqueId)
+        {
+            using (var context = GetContext())
+            {
+                return context.ReturnReports.Include("ReturnReportKeys").Where(r => r.CustomerReturnUniqueId == customerReportUniqueId).SingleOrDefault();
+            }
         }
 
         public ReturnReport GetReturnKeyByOneKeyID(long keyId, KeyStoreContext context)

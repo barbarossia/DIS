@@ -162,5 +162,7 @@ namespace DIS.Presentation.KMT
         ReportedKeysFaild,
 
         ReturnedKeysFaild,
+
+        OhrDataMissed,
     }
 }

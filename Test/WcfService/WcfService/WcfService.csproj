@@ -117,6 +117,7 @@
     <Compile Include="Contracts\Order\OrderResponse.cs" />
     <Compile Include="Contracts\Reporting\Binding.cs" />
     <Compile Include="Contracts\Reporting\BindingReportStatus.cs" />
+    <Compile Include="Contracts\Reporting\CbrSearchSubmittedResponse.cs" />
     <Compile Include="Contracts\Reporting\ComputerBuildReportAck.cs" />
     <Compile Include="Contracts\Reporting\ComputerBuildReportAckResponse.cs" />
     <Compile Include="Contracts\Reporting\ComputerBuildReportRequest.cs" />
@@ -132,6 +133,7 @@
     <Compile Include="Contracts\Reporting\ReturnRequest.cs" />
     <Compile Include="Contracts\Reporting\ReturnResponse.cs" />
     <Compile Include="Contracts\Reporting\ReturnReportStatus.cs" />
+    <Compile Include="Contracts\Reporting\ReturnSearchSubmittedResponse.cs" />
     <Compile Include="Contracts\Reporting\SuccessfulValidationResult.cs" />
     <Compile Include="DataRepository.cs" />
     <Compile Include="ExtendedMethods.cs" />

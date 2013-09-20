@@ -9,12 +9,12 @@
   <?Include $(var.ProjectDir)\Properties.wxs ?>
   <?Include $(var.ProjectDir)\ConfigurationComponent.wxs ?>
 
-  <Product Id="{C18AEFA2-5423-415F-8170-415EBAF53AE0}" Name="DIS Solution - OEMCorp" Language="1033" Version="7.0.0.0" Manufacturer="Microsoft Corporation" UpgradeCode="{1DED372C-E990-4B9E-8082-EAA2C2737DF7}">
+  <Product Id="{C18AEFA3-5423-415F-8470-415EBAF53AE0}" Name="DIS Solution - OEMCorp" Language="1033" Version="8.0.0.0" Manufacturer="Microsoft Corporation" UpgradeCode="{1DED372C-E990-4B9E-8082-EAA2C2737DF7}">
     <Package Comments="This installer database contains the logic and data required to install DIS Solution." Compressed="yes" Description="DIS Solution" InstallerVersion="400"  Languages="1033" Manufacturer="Microsoft Corporation" Platform="x86"/>
     <Property Id="PREVIOUSVERSIONSINSTALLED" Secure="yes" />
     <Upgrade Id="{1DED372C-E990-4B9E-8082-EAA2C2737DF7}">
       <UpgradeVersion
-         Minimum="6.0.0.0" Maximum="7.0.0.0"
+         Minimum="7.0.0.0" Maximum="8.0.0.0"
          Property="PREVIOUSVERSIONSINSTALLED"
          IncludeMinimum="yes" IncludeMaximum="no" />
     </Upgrade>

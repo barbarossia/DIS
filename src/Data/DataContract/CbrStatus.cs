@@ -19,6 +19,8 @@ namespace DIS.Data.DataContract {
     public enum CbrStatus {
         // CBR was generated, but not been sent
         Generated = 0,
+        // CBR is reporting
+        Sent = 7,
         // CBR was sent and MS GUID was retrieved
         Reported = 1,
         // CBR ack was ready

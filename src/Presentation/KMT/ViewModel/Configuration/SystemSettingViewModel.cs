@@ -38,6 +38,7 @@ namespace DIS.Presentation.KMT.ViewModel
         private string internalServicePort;
         private bool isAutoFulfillment;
         private bool isAutoReport;
+        private bool isRequireOHRData;
         private string oldTimeLine;
         private Visibility isMsServiceVisible;
         private string certificateSubject;
@@ -48,6 +49,7 @@ namespace DIS.Presentation.KMT.ViewModel
         private string sourceInternalServicePort;
         private bool sourceIsAutoFulfillment;
         private bool sourceIsAutoReport;
+        private bool sourceIsRequireOHRData;
         private string sourceOldTimeLine;
         private string sourceCertSubject;
         private string sourceMsServiceConfig;
@@ -57,6 +59,11 @@ namespace DIS.Presentation.KMT.ViewModel
         private bool isAutoReportChanged
         {
             get { return IsAutoReport != sourceIsAutoReport; }
+        }
+
+        private bool isRequireOHRDataChanged
+        {
+            get { return IsRequireOHRData != sourceIsRequireOHRData; }
         }
 
         private bool isAutoFulfillmentChanged
@@ -203,6 +210,16 @@ namespace DIS.Presentation.KMT.ViewModel
             }
         }
 
+        public bool IsRequireOHRData
+        {
+            get { return this.isRequireOHRData; }
+            set 
+            {
+                this.isRequireOHRData = value;
+                RaisePropertyChanged("IsRequireOHRData");
+            }
+        }
+
         public bool IsChanged
         {
             get
@@ -213,6 +230,7 @@ namespace DIS.Presentation.KMT.ViewModel
                     || isOldTimeLineChanged
                     || isAutoFulfillmentChanged
                     || isAutoReportChanged
+                    || isRequireOHRDataChanged
                     || isCertChanged
                     || IsMsServiceConfiglChanged;
                     
@@ -347,6 +365,14 @@ namespace DIS.Presentation.KMT.ViewModel
                             string.Format("Report automatically was changed to {0}.",
                                 IsAutoReport.ToString()));
                     }
+                    if (isRequireOHRDataChanged)
+                    {
+                        configProxy.UpdateRequireOHRDataSwitch(IsRequireOHRData);
+                        sourceIsRequireOHRData = IsRequireOHRData;
+                        MessageLogger.LogOperation(KmtConstants.LoginUser.LoginId,
+                            string.Format("Is Require OHR Data was changed to {0}.",
+                                IsRequireOHRData.ToString()));
+                    }
                     if (isInternalServiceChanged)
                     {
                         configProxy.UpdateInternalServiceConfig(internalServiceConfig);
@@ -451,6 +477,7 @@ namespace DIS.Presentation.KMT.ViewModel
 
             IsAutoFulfillment = configProxy.GetCanAutoFulfill();
             IsAutoReport = configProxy.GetCanAutoReport();
+            IsRequireOHRData = configProxy.GetRequireOHRData();
             OldTimeLine = ((int)configProxy.GetOldTimeline()).ToString();
             MsServiceConfig = configProxy.GetMsServiceConfig().ServiceHostUrl;
 
@@ -467,6 +494,7 @@ namespace DIS.Presentation.KMT.ViewModel
             sourceInternalServicePort = InternalServicePort;
             sourceIsAutoFulfillment = IsAutoFulfillment;
             sourceIsAutoReport = IsAutoReport;
+            sourceIsRequireOHRData=IsRequireOHRData;
             sourceOldTimeLine = OldTimeLine;
             sourceMsServiceConfig = MsServiceConfig;
         }

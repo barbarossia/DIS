@@ -31,6 +31,7 @@ namespace DIS.Services.DataPolling {
         private IConfigProxy configProxy;
         private IHeadQuarterProxy hqProxy;
 
+        private readonly int searchInterval;
         private readonly int defaultInterval;
 
         private Timer pulseTimer = null;
@@ -38,10 +39,12 @@ namespace DIS.Services.DataPolling {
         private Timer fulfillmentTimer = null;
         private Timer reportTimer = null;
         private Timer miscTimer = null;
+        private Timer searchTimer = null;
 
         private bool isFulfilling = false;
         private bool isReporting = false;
         private bool isMiscRunning = false;
+        private bool isSearching = false;
 
         #endregion Private fields
 
@@ -79,6 +82,7 @@ namespace DIS.Services.DataPolling {
             AutoLog = true;
 
             defaultInterval = Math.Max(int.Parse(ConfigurationManager.AppSettings["interval"]), 60000);
+            searchInterval = Math.Max(int.Parse(ConfigurationManager.AppSettings["searchInterval"]), 60000);
         }
 
         #endregion Consturctor
@@ -115,6 +119,11 @@ namespace DIS.Services.DataPolling {
                 pulseTimer.Enabled = true;
                 pulseTimer.Interval = Constants.PulseInterval;
                 pulseTimer.Elapsed += new ElapsedEventHandler(PulseTimerElapsed);
+
+                searchTimer = new Timer();
+                searchTimer.Enabled = true;
+                searchTimer.Interval = searchInterval;
+                searchTimer.Elapsed += new ElapsedEventHandler(SearchTimerElapsed);
             }
             catch (Exception ex) {
                 ExceptionHandler.HandleException(ex);
@@ -140,6 +149,9 @@ namespace DIS.Services.DataPolling {
             pulseTimer.Elapsed -= new ElapsedEventHandler(PulseTimerElapsed);
             pulseTimer.Dispose();
 
+            searchTimer.Elapsed -= new ElapsedEventHandler(SearchTimerElapsed);
+            searchTimer.Dispose();
+
             base.OnShutdown();
         }
 
@@ -161,6 +173,9 @@ namespace DIS.Services.DataPolling {
 
             pulseTimer.Elapsed -= new ElapsedEventHandler(PulseTimerElapsed);
             pulseTimer.Enabled = false;
+
+            searchTimer.Elapsed -= new ElapsedEventHandler(SearchTimerElapsed);
+            searchTimer.Dispose();
 
             base.OnStop();
         }
@@ -230,6 +245,19 @@ namespace DIS.Services.DataPolling {
                     p.DoRecurringTasks();
                 });
                 isMiscRunning = false;
+            }
+        }
+
+        private void SearchTimerElapsed(object sender, ElapsedEventArgs e)
+        {
+            if (!isSearching)
+            {
+                isSearching = true;
+                LoopForHeadQuarters(p =>
+                {
+                    p.SearchSubmitted();
+                });
+                isSearching = false;
             }
         }
 

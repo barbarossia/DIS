@@ -103,6 +103,17 @@ namespace DIS.Data.DataAccess.Mapping
 			this.Property(t => t.ZCHANNEL_REL_ID)
 				.HasMaxLength(32);
 
+            this.Property(t => t.ZFRM_FACTOR_CL1)
+                .HasMaxLength(64);
+
+            this.Property(t => t.ZFRM_FACTOR_CL2)
+                .HasMaxLength(64);
+
+            this.Property(t => t.ZSCREEN_SIZE)
+                .HasMaxLength(32);
+            this.Property(t => t.ZTOUCH_SCREEN)
+                .HasMaxLength(32);
+
             this.Property(t => t.TrackingInfo)
                 .HasMaxLength(1024);
 
@@ -149,6 +160,10 @@ namespace DIS.Data.DataAccess.Mapping
 			this.Property(t => t.ZPGM_ELIG_VALUES).HasColumnName("ZPGM_ELIG_VALUES");
 			this.Property(t => t.ZOEM_EXT_ID).HasColumnName("ZOEM_EXT_ID");
 			this.Property(t => t.ZCHANNEL_REL_ID).HasColumnName("ZCHANNEL_REL_ID");
+            this.Property(t => t.ZFRM_FACTOR_CL1).HasColumnName("ZFRM_FACTOR_CL1");
+            this.Property(t => t.ZFRM_FACTOR_CL2).HasColumnName("ZFRM_FACTOR_CL2");
+            this.Property(t => t.ZSCREEN_SIZE).HasColumnName("ZSCREEN_SIZE");
+            this.Property(t => t.ZTOUCH_SCREEN).HasColumnName("ZTOUCH_SCREEN");
             this.Property(t => t.TrackingInfo).HasColumnName("TrackingInfo");
             this.Property(t => t.Tags).HasColumnName("Tags");
             this.Property(t => t.Description).HasColumnName("Description");

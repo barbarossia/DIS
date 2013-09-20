@@ -95,6 +95,11 @@ namespace DIS.Data.DataContract
         public string ZMANUF_GEO_LOC { get { return OemOptionalInfo == null ? null : OemOptionalInfo.ZMANUF_GEO_LOC; } set { OemOptionalInfo.ZMANUF_GEO_LOC = value; } }
         public string ZPGM_ELIG_VALUES { get { return OemOptionalInfo == null ? null : OemOptionalInfo.ZPGM_ELIG_VALUES; } set { OemOptionalInfo.ZPGM_ELIG_VALUES = value; } }
         public string ZCHANNEL_REL_ID { get { return OemOptionalInfo == null ? null : OemOptionalInfo.ZCHANNEL_REL_ID; } set { OemOptionalInfo.ZCHANNEL_REL_ID = value; } }
+        
+        public string ZFRM_FACTOR_CL1 { get { return OemOptionalInfo == null ? null : OemOptionalInfo.ZFRM_FACTOR_CL1; } set { OemOptionalInfo.ZFRM_FACTOR_CL1 = value; } }
+        public string ZFRM_FACTOR_CL2 { get { return OemOptionalInfo == null ? null : OemOptionalInfo.ZFRM_FACTOR_CL2; } set { OemOptionalInfo.ZFRM_FACTOR_CL2 = value; } }
+        public string ZSCREEN_SIZE { get { return OemOptionalInfo == null ? null : OemOptionalInfo.ZSCREEN_SIZE; } set { OemOptionalInfo.ZSCREEN_SIZE = value; } }
+        public string ZTOUCH_SCREEN { get { return OemOptionalInfo == null ? null : OemOptionalInfo.ZTOUCH_SCREEN; } set { OemOptionalInfo.ZTOUCH_SCREEN = value; } }
         public string Tags { get; set; }
         public string Description { get; set; }
         

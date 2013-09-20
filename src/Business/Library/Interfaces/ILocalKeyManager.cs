@@ -128,7 +128,7 @@ namespace DIS.Business.Library
         List<KeyOperationResult> SaveKeysAfterGetting(List<KeyInfo> keys, bool isInProgress, bool? shouldBeCarbonCopy = null, KeyStoreContext context = null);
 
         // ULS receiving sync notification from DLS.
-        void ReceiveSyncNotification(List<KeyInfo> keys);
+        List<KeyOperationResult> ReceiveSyncNotification(List<KeyInfo> keys);
 
         #endregion
 
@@ -165,11 +165,6 @@ namespace DIS.Business.Library
         // ULS receive bound keys from DLS.
         List<KeyOperationResult> ReceiveBoundKeys(List<KeyInfo> keys, int fromSsId);
 
-        // DLS update it's keys status after the keys been reported to ULS.
-        void UpdateKeysAfterReportBinding(Cbr cbr);
-
-        void UpdateKeysAfterReturnReport(List<ReturnReportKey> returnReportKeys);
-
         #endregion
 
         #region Sync down/up keys state
@@ -183,6 +178,8 @@ namespace DIS.Business.Library
 
         List<KeyInfo> SearchToReturnKeys(KeySearchCriteria searchCriteria);
 
+        ReturnReport GetFirstSentReturnReport();
+
         List<ReturnReport> GetReportedReturnReports();
 
         List<ReturnReport> GetReadyReturnReports();
@@ -191,7 +188,9 @@ namespace DIS.Business.Library
 
         List<ReturnReport> GetCompletedReturnReports();
 
-        void UpdateReturnAfterReported(ReturnReport returnReport);
+        void UpdateReturnReportIfSendingFailed(ReturnReport returnReport);
+
+        void UpdateReturnReportIfSearchResultEmpty(ReturnReport returnReport);
 
         void UpdateReturnsAfterAckReady(List<ReturnReport> returnReports);
 
@@ -200,8 +199,6 @@ namespace DIS.Business.Library
         void UpdateReturnWhenAckFailed(ReturnReport returnReport);
 
         List<KeyOperationResult> SaveGeneratedReturnReport(ReturnReport returnReport);
-
-        void SendReturnReports(Func<ReturnReport, Guid> sendReportReturn);
 
         #endregion
     }

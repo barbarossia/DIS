@@ -205,6 +205,25 @@ namespace WcfService
             }
         }
 
+        public CbrSearchSubmittedResponse[] SearchSubmittedCbr(Guid customerReportUniqueID)
+        {
+            using (var db = GetContext())
+            {
+                var ack = db.ComputerBuildReports.Where(c => c.CustomerReportUniqueID == customerReportUniqueID).SingleOrDefault();
+                if (ack != null)
+                {
+                    return new []{new CbrSearchSubmittedResponse()
+                    {
+                        MSReportUniqueID = ack.MSReportUniqueID.Value,
+                        CustomerReportUniqueID = ack.CustomerReportUniqueID,
+                        ReportReceiptDateUTC = ack.MSReceivedDateUTC.Value,
+                    }};
+                }
+
+                return null;
+            }
+        }
+
         public ComputerBuildReportAckResponse SetComputerBuildReportAckStatus(string reportUniqueId, bool isBeenSent)
         {
             using (var db = GetContext())
@@ -262,6 +281,26 @@ namespace WcfService
                 }
                 else
                     return null;
+            }
+        }
+
+        public ReturnSearchSubmittedResponse[] SearchSubmittedReturn(string oemRMANumber, DateTime oemRMADateUTC)
+        {
+            using (var db = GetContext())
+            {
+                ReturnReport  ack= db.ReturnReports.Where(c => c.OEMRMANumber == oemRMANumber && c.OEMRMADateUTC == oemRMADateUTC).SingleOrDefault();
+                if (ack != null)
+                {
+                    return new [] {new ReturnSearchSubmittedResponse()
+                    {
+                        OEMRMANumber = ack.OEMRMANumber,
+                        OEMRMADateUTC = ack.OEMRMADateUTC,
+                        ReturnReceiptDateUTC = ack.ReturnDateUTC.Value,
+                        ReturnUniqueID = ack.ReturnUniqueID,
+                    }};
+                }
+
+                return null;
             }
         }
 
@@ -528,5 +567,6 @@ namespace WcfService
         }
 
         #endregion
+
     }
 }

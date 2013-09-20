@@ -23,7 +23,7 @@ namespace DIS.Data.DataAccess
     public class KeyStoreContext : DbContext
     {
         static KeyStoreContext()
-        { 
+        {
             Database.SetInitializer<KeyStoreContext>(null);
         }
 
@@ -44,15 +44,18 @@ namespace DIS.Data.DataAccess
             }
         }
 
+        public override int SaveChanges()
+        {
+            if (Transaction != null)
+                Transaction.Commit();
+            return base.SaveChanges();
+        }
+
         protected override void Dispose(bool disposing)
         {
             try
             {
-                if (Transaction != null)
-                {
-                    Transaction.Commit();
-                    connection.Close();
-                }
+                connection.Close();
             }
             finally
             {

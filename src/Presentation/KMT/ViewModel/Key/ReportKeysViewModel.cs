@@ -37,13 +37,14 @@ namespace DIS.Presentation.KMT.ViewModel
         /// View Model class fo rReport Keys View
         /// </summary>
         /// <param name="keyProxy"></param>
-        public ReportKeysViewModel(IKeyProxy keyProxy)
+        public ReportKeysViewModel(IKeyProxy keyProxy,IConfigProxy configProxy)
             : base(keyProxy)
         {
             base.WindowTitle = MergedResources.MainWindow_ReportKeys;
-
+            this.configProxy = configProxy;
             Initialize();
             this.SearchControlVM.KeyTypesVisibility = Visibility.Collapsed;
+            isRequireOHRData = configProxy.GetRequireOHRData();
         }
 
         #endregion
@@ -71,6 +72,10 @@ namespace DIS.Presentation.KMT.ViewModel
         #region Private Members
 
         private string sendFailedText;
+
+        private IConfigProxy configProxy;
+
+        private bool isRequireOHRData;
 
         private void Initialize()
         {
@@ -103,6 +108,56 @@ namespace DIS.Presentation.KMT.ViewModel
             KeyGroups = new ObservableCollection<KeyGroupModel>(base.keyProxy.SearchBoundKeyGroupsToReport(KeySearchCriteria).ToKeyGroupModel());
         }
 
+        protected override bool ValidateKeyGroups()
+        {
+            if (!base.ValidateKeyGroups())
+                return false;
+            if (KmtConstants.IsOemCorp || (KmtConstants.IsTpiCorp && (KmtConstants.CurrentHeadQuarter != null) && (!KmtConstants.CurrentHeadQuarter.IsCentralizedMode)))
+            {
+                if (keyProxy.SearchBoundKeysToReport(base.KeyGroups.Where(k => k.KeyGroup.Quantity > 0).Select(k => k.KeyGroup).ToList()).Any(k => !k.OemOptionalInfo.HasOHRData))
+                {
+                  
+                    if (isRequireOHRData)
+                    {
+                        MessageBox.Show(ResourcesOfRTMv1_6.EditOptionalInfo_RequireOHRDataMsg, MergedResources.Common_Error, MessageBoxButton.OK, MessageBoxImage.Error);
+                        return false;
+                    }
+                    else
+                    {
+                        MessageBoxResult confirm = System.Windows.MessageBox.Show(ResourcesOfRTMv1_6.EditOptionalInfo_MissOHRDataMsg, MergedResources.Common_Confirmation, MessageBoxButton.OKCancel);
+                        if (confirm != MessageBoxResult.OK)
+                            return false;
+                    }
+                }
+            }
+            return true;
+        }
+
+
+
+        protected override bool ValidateKeys()
+        {
+            if (!base.ValidateKeys())
+                return false;
+            if (KmtConstants.IsOemCorp || (KmtConstants.IsTpiCorp && (KmtConstants.CurrentHeadQuarter != null) && (!KmtConstants.CurrentHeadQuarter.IsCentralizedMode)))
+            {
+                if (base.Keys.Where(k => k.IsSelected).Any(k => !k.keyInfo.OemOptionalInfo.HasOHRData))
+                {
+                    if (isRequireOHRData)
+                    {
+                        MessageBox.Show(ResourcesOfRTMv1_6.EditOptionalInfo_RequireOHRDataMsg, MergedResources.Common_Error, MessageBoxButton.OK, MessageBoxImage.Error);
+                        return false;
+                    }
+                    else
+                    {
+                        MessageBoxResult confirm = System.Windows.MessageBox.Show(ResourcesOfRTMv1_6.EditOptionalInfo_MissOHRDataMsg, MergedResources.Common_Confirmation, MessageBoxButton.OKCancel);
+                        if (confirm != MessageBoxResult.OK)
+                            return false;
+                    }
+                }
+            }
+            return true;
+        }
         /// <summary>
         /// Execute keys for report
         /// </summary>

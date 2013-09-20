@@ -48,16 +48,16 @@ namespace DIS.Data.DataAccess.Repository {
                 {
                     context.CbrKeys.Add(key);
                 }
-                context.SaveChanges();
             });
         }
 
-        public void UpdateCbr(Cbr cbr) {
-            using (var context = GetContext()) {
+        public void UpdateCbr(Cbr cbr, KeyStoreContext context = null)
+        {
+            UsingContext(ref context, () =>
+            {
                 cbr.ModifiedDateUtc = DateTime.UtcNow;
                 UpdateCbr(context, cbr);
-                context.SaveChanges();
-            }
+            });
         }
 
         public void UpdateCbrAck(Cbr cbr, bool IsDuplicateImport = false, KeyStoreContext context = null)

@@ -32,6 +32,16 @@ namespace DIS.Business.Library
             return keyRepository.SearchKeys(GetToReturnKeysSearchCriteria(searchCriteria));
         }
 
+        public ReturnReport GetFirstSentReturnReport()
+        {
+            ReturnKeySearchCriteria criteria = new ReturnKeySearchCriteria()
+            {
+                ReturnReportStatus = ReturnReportStatus.Sent
+            };
+
+            return returnKeyRepository.SearchReturnKeys(criteria).FirstOrDefault();
+        }
+
         public List<ReturnReport> GetReportedReturnReports()
         {
             ReturnKeySearchCriteria criteria = new ReturnKeySearchCriteria()
@@ -82,6 +92,18 @@ namespace DIS.Business.Library
             return returnKeyRepository.SearchReturnKeys(criteria);
         }
 
+        public void UpdateReturnReportIfSendingFailed(ReturnReport returnReport)
+        {
+            returnReport.ReturnReportStatus = ReturnReportStatus.Sent;
+            returnKeyRepository.UpdateReturnReport(returnReport);
+        }
+
+        public void UpdateReturnReportIfSearchResultEmpty(ReturnReport returnReport)
+        {
+            returnReport.ReturnReportStatus = ReturnReportStatus.Generated;
+            returnKeyRepository.UpdateReturnReport(returnReport);
+        }
+
         public void UpdateReturnsAfterAckReady(List<ReturnReport> returnReports)
         {
             if (returnReports.Any(r => r.ReturnReportStatus != ReturnReportStatus.Reported && r.ReturnReportStatus != ReturnReportStatus.Failed))
@@ -107,13 +129,13 @@ namespace DIS.Business.Library
             returnKeyRepository.UpdateReturnReport(returnReport);
         }
 
-        public void UpdateReturnAfterReported(ReturnReport returnReport)
+        protected void UpdateReturnAfterReported(ReturnReport returnReport, KeyStoreContext context)
         {
             if (returnReport.CustomerReturnUniqueId == null)
                 throw new ArgumentException("Return is invalid.");
 
             returnReport.ReturnReportStatus = ReturnReportStatus.Reported;
-            returnKeyRepository.UpdateReturnReport(returnReport);
+            returnKeyRepository.UpdateReturnReport(returnReport, context);
         }
 
         public List<KeyOperationResult> SaveGeneratedReturnReport(ReturnReport returnReport)
@@ -122,24 +144,6 @@ namespace DIS.Business.Library
             keyRepository.UpdateKeys(results.Where(k => !k.Failed).Select(k => k.Key).ToList(), true, null);
             SaveReturnReport(returnReport);
             return results;
-        }
-
-        public void SendReturnReports(Func<ReturnReport, Guid> sendReportReturn)
-        {
-            List<ReturnReport> returnReports = GetReturnReportsNotSent();
-            foreach (var returnReport in returnReports)
-            {
-                try
-                {
-                    returnReport.ReturnUniqueId = sendReportReturn(returnReport);
-                    UpdateReturnAfterReported(returnReport);
-                    UpdateKeysAfterReturnReport(returnReport.ReturnReportKeys);
-                }
-                catch (Exception ex)
-                {
-                    ExceptionHandler.HandleException(ex);
-                }
-            }
         }
 
         private void UpdateReturnByAck(ReturnReport returnReport, ReturnReport dbReturnReport, KeyStoreContext context = null)
@@ -151,6 +155,7 @@ namespace DIS.Business.Library
             dbReturnReport.ReturnUniqueId =(returnReport.ReturnUniqueId==System.Guid.Empty?null: returnReport.ReturnUniqueId);
             dbReturnReport.MsReturnNumber = returnReport.MsReturnNumber;
             dbReturnReport.ReturnDateUTC = returnReport.ReturnDateUTC;
+            dbReturnReport.OemRmaNumber = returnReport.OemRmaNumber;       
             dbReturnReport.OemRmaDateUTC = returnReport.OemRmaDateUTC;
             dbReturnReport.SoldToCustomerName = returnReport.SoldToCustomerName;
             dbReturnReport.ReturnReportStatus = ReturnReportStatus.Completed;
@@ -161,6 +166,7 @@ namespace DIS.Business.Library
                 {
                     k1.MsReturnLineNumber = k2.MsReturnLineNumber;
                     k1.OemRmaLineNumber = k2.OemRmaLineNumber;
+                    k1.ReturnTypeId = k2.ReturnTypeId;
                     k1.LicensablePartNumber = k2.LicensablePartNumber;
                     k1.ReturnReasonCode = k2.ReturnReasonCode;
                     k1.ReturnReasonCodeDescription = k2.ReturnReasonCodeDescription;
@@ -169,6 +175,8 @@ namespace DIS.Business.Library
                 var update = (from db in dbReturnReport.ReturnReportKeys
                               join ack in returnReport.ReturnReportKeys on db.KeyId equals ack.KeyId
                               select updateReturnReportAck(db, ack)).ToList();
+                if (dbReturnReport.ReturnReportKeys.All(k => k.ReturnReasonCodeDescription.Contains("Accepted")))
+                    dbReturnReport.ReturnNoCredit = false;
             }
             returnKeyRepository.UpdateReturnKeyAck(dbReturnReport, context);
         }

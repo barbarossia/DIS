@@ -1042,7 +1042,7 @@ namespace DIS.Presentation.KMT.ViewModel
 
         private void OnReportKeys()
         {
-            ReportKeysWizard reportWizard = new ReportKeysWizard(keyProxy);
+            ReportKeysWizard reportWizard = new ReportKeysWizard(keyProxy,configProxy);
             reportWizard.Owner = View;
             reportWizard.ShowDialog();
             if (reportWizard.btnFinish.Visibility == Visibility.Visible)
@@ -1250,6 +1250,7 @@ namespace DIS.Presentation.KMT.ViewModel
             notificationWindow.VM.Check += new NotificationEventHandler(CheckDuplicatedCbr);
             notificationWindow.VM.Check += new NotificationEventHandler(CheckKeysExpired);
             notificationWindow.VM.Check += new NotificationEventHandler(CheckKeyTypeConfigurations);
+            notificationWindow.VM.Check += new NotificationEventHandler(CheckOhrData);
             RegisterSystemCheck(configProxy.GetIsAutoDiagnostic());
         }
 
@@ -1269,6 +1270,37 @@ namespace DIS.Presentation.KMT.ViewModel
             else
             {
                 NotificationColor = hasNoNotification;
+            }
+        }
+
+        private void CheckOhrData(object sender, NotificationEventArgs e)
+        {
+            try
+            {
+                NotificationCategory category = NotificationCategory.OhrDataMissed;
+                if (configProxy.GetRequireOHRData())
+                {
+                    List<KeyInfo> keys = keyProxy.GetBoundKeysWithoutOhrData();
+                    Dispatch(() =>
+                    {
+                        if (keys != null && keys.Any())
+                            e.Push(new Notification(category,
+                                string.Format(ResourcesOfRTMv1_6.OhrDataMissedFormat, keys.Count),
+                                typeof(EditKeysOptionalInfo), () =>
+                                {
+                                    CheckOhrData(sender, e);
+                                    OnRefreshKeys();
+                                }, keyProxy, keys, false));
+                        else
+                            e.Pop(category);
+                    });
+                }
+                else
+                    e.Pop(category);
+            }
+            catch (Exception ex)
+            {
+                MessageLogger.LogSystemError(MessageLogger.GetMethodName(), ex.GetTraceText());
             }
         }
 

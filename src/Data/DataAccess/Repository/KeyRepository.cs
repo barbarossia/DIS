@@ -241,6 +241,25 @@ namespace DIS.Data.DataAccess.Repository
             if (!string.IsNullOrEmpty(criteria.ZPGM_ELIG_VALUES))
                 query = query.Where(k => k.ZPGM_ELIG_VALUES == criteria.ZPGM_ELIG_VALUES);
 
+            if (!string.IsNullOrEmpty(criteria.ZFRM_FACTOR_CL1))
+                query = query.Where(k => k.ZFRM_FACTOR_CL1 == criteria.ZFRM_FACTOR_CL1);
+
+            if (!string.IsNullOrEmpty(criteria.ZFRM_FACTOR_CL2))
+                query = query.Where(k => k.ZFRM_FACTOR_CL2 == criteria.ZFRM_FACTOR_CL2);
+
+            if (!string.IsNullOrEmpty(criteria.ZSCREEN_SIZE))
+                query = query.Where(k => k.ZSCREEN_SIZE == criteria.ZSCREEN_SIZE);
+
+            if (!string.IsNullOrEmpty(criteria.ZTOUCH_SCREEN))
+                query = query.Where(k => k.ZTOUCH_SCREEN == criteria.ZTOUCH_SCREEN);
+
+            if (criteria.HasOhrData != null)
+                query = query.Where(k => (
+                    k.ZFRM_FACTOR_CL1 != null && k.ZFRM_FACTOR_CL1 != string.Empty &&
+                    k.ZFRM_FACTOR_CL2 != null && k.ZFRM_FACTOR_CL2 != string.Empty &&
+                    k.ZSCREEN_SIZE != null && k.ZSCREEN_SIZE != string.Empty &&
+                    k.ZTOUCH_SCREEN != null && k.ZTOUCH_SCREEN != string.Empty &&
+                    k.ZPC_MODEL_SKU != null && k.ZPC_MODEL_SKU != string.Empty) == criteria.HasOhrData.Value);
 
             if (criteria.OemRmaDateFrom != null && criteria.OemRmaDateTo != null)
                 query = query.Where(k => k.ReturnReportKeys.Any(r => r.ReturnReport.OemRmaDateUTC >= criteria.OemRmaDateFromUtc && r.ReturnReport.OemRmaDateUTC <= criteria.OemRmaDateToUtc));
@@ -282,10 +301,17 @@ namespace DIS.Data.DataAccess.Repository
                     returnQuery = returnQuery.Where(r => r.ReturnReportStatusId == (int)criteria.ReturnReportStatus);
                 if (!string.IsNullOrEmpty(criteria.OemRmaNumber))
                     returnQuery = returnQuery.Where(r => r.OemRmaNumber == criteria.OemRmaNumber);
-                if (criteria.HasNoCredit != null)
-                    returnQuery = returnQuery.Where(r => r.ReturnNoCredit == criteria.HasNoCredit.Value);
-                List<long> keyIds = returnQuery.ToList().SelectMany(r => r.ReturnReportKeys).Where(k => !string.IsNullOrEmpty(k.ReturnReasonCode) && (k.ReturnReasonCode.StartsWith("O") || k.ReturnReasonCode.StartsWith("Q"))).Select(rk => rk.KeyId).Distinct().ToList();
-
+                List<long> keyIds = null;
+                if (criteria.HasNoCredit == null)
+                    keyIds = returnQuery.ToList().SelectMany(r => r.ReturnReportKeys).Where(k => !string.IsNullOrEmpty(k.ReturnReasonCode) && (k.ReturnReasonCode.StartsWith("O") || k.ReturnReasonCode.StartsWith("Q"))).Select(rk => rk.KeyId).Distinct().ToList();
+                else
+                {
+                    // returnQuery = returnQuery.Where(r => r.ReturnNoCredit == criteria.HasNoCredit.Value);
+                    if (criteria.HasNoCredit.Value)
+                        keyIds = returnQuery.ToList().SelectMany(r => r.ReturnReportKeys).Where(k => !string.IsNullOrEmpty(k.ReturnReasonCode) && k.ReturnReasonCode.StartsWith("Q")).Select(rk => rk.KeyId).Distinct().ToList();
+                    else
+                        keyIds = returnQuery.ToList().SelectMany(r => r.ReturnReportKeys).Where(k => !string.IsNullOrEmpty(k.ReturnReasonCode) && k.ReturnReasonCode.StartsWith("O")).Select(rk => rk.KeyId).Distinct().ToList();
+                }
                 query = query.Where(k => keyIds.Contains(k.KeyId));
             }
 
@@ -463,6 +489,7 @@ namespace DIS.Data.DataAccess.Repository
                     context.Database.ExecuteSqlCommand(
                         string.Format("DELETE {0} FROM {0} K JOIN {1} TMP ON K.PRODUCTKEYID = TMP.KEYID", table, tempKeyIdName));
                 }
+                context.SaveChanges();
             }
         }
 

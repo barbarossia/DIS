@@ -34,8 +34,12 @@ namespace WcfService
         string[] RetrieveComputerBuildReportAcknowledge();
 
         [OperationContract]
-        [WebGet(UriTemplate = "computerbuildreport/acknowledgements/{reportUniqueID}")]
+        [WebGet(UriTemplate = "/computerbuildreport/acknowledgements/{reportUniqueID}")]
         ComputerBuildReportAckResponse RetrieveReportBindings(string reportUniqueId);
+
+        [OperationContract]
+        [WebGet(UriTemplate = "/computerbuildreport/royd/v1/SearchSubmitted?CustomerReportUniqueID={customerReportUniqueID}")]
+        CbrSearchSubmittedResponse[] SearchSubmittedCbr(string customerReportUniqueID);
 
         [OperationContract]
         [WebGet(UriTemplate = "/fulfillments/?status=ready")]
@@ -72,5 +76,9 @@ namespace WcfService
         [OperationContract]
         [WebGet(UriTemplate = "/return/acknowledgements/{returnUniqueID}")]
         ReturnAck RetrieveReportReturn(string returnUniqueID);
+
+        [OperationContract]
+        [WebGet(UriTemplate = "/return/royd/v1/SearchSubmitted?OEMRMANumber={oemRMANumber}&OEMRMADateUTC={oemRMADateUTC}")]
+        ReturnSearchSubmittedResponse[] SearchSubmittedReturn(string oemRMANumber, DateTime oemRMADateUTC);
     }
 }

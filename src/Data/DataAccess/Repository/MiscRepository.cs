@@ -186,6 +186,7 @@ namespace DIS.Data.DataAccess.Repository
                 SetupTempKeyIdTable(context, keyIds);
                 context.Database.ExecuteSqlCommand(
                         string.Format("DELETE {0} FROM {0} K JOIN {1} TMP ON K.PRODUCTKEYID = TMP.KEYID", table, tempKeyIdName));
+                context.SaveChanges();
             };
         }
 

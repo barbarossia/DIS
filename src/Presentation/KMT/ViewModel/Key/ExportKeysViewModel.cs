@@ -39,6 +39,7 @@ namespace DIS.Presentation.KMT.ViewModel
         private string targetFileName = string.Empty;
         private const string strBackSpace = "\b";
         private const string strZero = "0";
+        private bool isRequireOHRData;
 
         private string fileLabelTxt;
         private Constants.ExportType exportType;
@@ -670,6 +671,7 @@ namespace DIS.Presentation.KMT.ViewModel
             InitRbEnable();
             if (ExportTypeChanged != null)
                 ExportTypeChanged(this, new EventArgs());
+            isRequireOHRData = configProxy.GetRequireOHRData();
         }
 
         /// <summary>
@@ -1013,6 +1015,22 @@ namespace DIS.Presentation.KMT.ViewModel
                 MessageBoxResult confirmkey = System.Windows.MessageBox.Show(string.Format(MergedResources.Export_ConfirmToMsg, MergedResources.Export_Ms).ToString() + "," + System.Environment.NewLine + MergedResources.ExportKey_ConfirmMsg, MergedResources.Common_Confirmation, MessageBoxButton.OKCancel);
                 if (confirmkey != MessageBoxResult.OK)
                     return false;
+
+                if ((TabIndex==0&&keyProxy.SearchBoundKeysToReport(base.KeyGroups.Where(k => k.KeyGroup.Quantity > 0).Select(k => k.KeyGroup).ToList()).Any(k => !k.OemOptionalInfo.HasOHRData)) ||(TabIndex==1&&base.Keys.Where(k => k.IsSelected).Any(k => !k.keyInfo.OemOptionalInfo.HasOHRData)))
+                {
+                    if (isRequireOHRData)
+                    {
+                        System.Windows.MessageBox.Show(ResourcesOfRTMv1_6.EditOptionalInfo_RequireOHRDataMsg, MergedResources.Common_Error, MessageBoxButton.OK, MessageBoxImage.Error);
+                        return false;
+                    }
+                    else
+                    {
+                        MessageBoxResult confirm = System.Windows.MessageBox.Show(ResourcesOfRTMv1_6.EditOptionalInfo_MissOHRDataMsg, MergedResources.Common_Confirmation, MessageBoxButton.OKCancel);
+                        if (confirm != MessageBoxResult.OK)
+                            return false;
+                    }
+                }
+
             }
             return true;
         }

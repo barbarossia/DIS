@@ -193,7 +193,11 @@ namespace DIS.Business.Library
         public void GetAndSaveCarbonCopyReturnReport(ReturnReport returnReport)
         {
             returnReport.ReturnReportStatus = ReturnReportStatus.Completed;
-            returnKeyRepository.InsertReturnReportAndKeys(returnReport);
+            ReturnReport returndb = returnKeyRepository.GetReturnKeyByCustomerId(returnReport.CustomerReturnUniqueId);
+            if (returndb == null)
+                returnKeyRepository.InsertReturnReportAndKeys(returnReport);
+            else
+                returnKeyRepository.UpdateReturnReport(returnReport);
         }
 
         public long[] UpdateKeyStateAfterRecieveSyncNotification(List<KeySyncNotification> keySyncNotifications)
@@ -201,7 +205,7 @@ namespace DIS.Business.Library
             List<KeyInfo> keysInDb = GetKeysInDb(keySyncNotifications.Select(k => k.KeyId));
 
             if (keysInDb == null || keysInDb.Count == 0)
-                throw new ApplicationException("Update keys after retrieve cbr ack are not found.");
+                throw new ApplicationException("Update keys are not found.");
 
             List<KeyOperationResult> results = new List<KeyOperationResult>();
 
@@ -331,7 +335,7 @@ namespace DIS.Business.Library
         }
 
         // Invoked by ULS.
-        public void ReceiveSyncNotification(List<KeyInfo> keys)
+        public List<KeyOperationResult> ReceiveSyncNotification(List<KeyInfo> keys)
         {
             ValidateIfEmpty(keys);
 
@@ -356,6 +360,13 @@ namespace DIS.Business.Library
 
             if (keysToUpdate.Count > 0)
                 keyRepository.UpdateKeys(keysToUpdate, false, null);
+
+            return keysToUpdate.Select(k => new KeyOperationResult()
+            {
+                Failed = false,
+                Key = new KeyInfo() { KeyId = k.KeyId, KeyInfoEx = k.KeyInfoEx },
+                FailedType = KeyErrorType.None
+            }).ToList();
         }
 
         public List<KeyOperationResult> ReceiveBoundKeys(List<KeyInfo> keys, int fromSsId)
@@ -419,7 +430,7 @@ namespace DIS.Business.Library
             return succeedKeys;
         }
 
-        public void UpdateKeysAfterReportBinding(Cbr cbr)
+        protected void UpdateKeysAfterReportBinding(Cbr cbr, KeyStoreContext context)
         {
             List<KeyInfo> keys = GetKeysInDb(cbr.CbrKeys.Select(k => k.KeyId));
             if (keys != null && keys.Count > 0)
@@ -435,11 +446,11 @@ namespace DIS.Business.Library
                         ExceptionHandler.HandleException(ex);
                     }
                 }
-                keyRepository.UpdateKeys(keys, false, null);
+                keyRepository.UpdateKeys(keys, false, null, context: context);
             }
         }
 
-        public void UpdateKeysAfterReturnReport(List<ReturnReportKey> returnReportKeys)
+        protected void UpdateKeysAfterReturnReport(List<ReturnReportKey> returnReportKeys, KeyStoreContext context)
         {
             if (returnReportKeys != null && returnReportKeys.Count > 0)
             {
@@ -456,7 +467,7 @@ namespace DIS.Business.Library
                     }
                 }
 
-                keyRepository.UpdateKeys(keysToUpdate, false, null);
+                keyRepository.UpdateKeys(keysToUpdate, false, null, context: context);
             }
         }
 

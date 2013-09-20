@@ -40,19 +40,17 @@ namespace DIS.Business.Proxy
         //report keys to ULS or MS
         public List<KeyOperationResult> SendBoundKeys(List<KeyInfo> keys)
         {
-            if (keys.Any(k => k.KeyState != KeyState.Bound || k.KeyInfoEx.HqId != CurrentHeadQuarterId))
+            if (keys.Any(k => k.KeyInfoEx.HqId != CurrentHeadQuarterId))
                 throw new ApplicationException("Keys to be reported are invalid.");
             List<KeyInfo> keysIndb = base.GetKeysInDb(keys);
             if (keysIndb.Any(k => k.KeyState != KeyState.Bound))
-                throw new DisException("ExportKeys_DataChangeError");
+                throw new DisException("Do not report repeatedly, these keys had already been reported by backend service.");
             return ReportKeys(keys);
         }
 
         public List<KeyOperationResult> SendBoundKeys(List<KeyGroup> groupKeys)
         {
             List<KeyInfo> keys = base.SearchBoundKeysToReport(groupKeys);
-            if (keys.Any(k => k.KeyState != KeyState.Bound || k.KeyInfoEx.HqId != CurrentHeadQuarterId))
-                throw new ApplicationException("Keys to be reported are invalid.");
             return SendBoundKeys(keys);
         }
 
@@ -63,6 +61,7 @@ namespace DIS.Business.Proxy
                 List<KeyInfo> keysToReport = SearchBoundKeysToReport(new KeySearchCriteria()
                 {
                     HasHardwareHash = true,
+                    HasOhrData = configManager.GetRequireOHRData() ? (bool?)true : null,
                     PageSize = Constants.BatchLimit,
                 });
                 if (keysToReport.Count == 0)
@@ -71,8 +70,20 @@ namespace DIS.Business.Proxy
             }
         }
 
+        public List<KeyInfo> GetBoundKeysWithoutOhrData()
+        {
+            if (!configManager.GetCanAutoReport() || !configManager.GetRequireOHRData())
+                return null;
+
+            return SearchBoundKeysToReport(new KeySearchCriteria()
+            {
+                HasOhrData = false,
+                PageSize = Constants.BatchLimit,
+            });
+        }
+
         //Re-send faild CBR to ms in the background
-        public void SendGeneratedCbrs()
+        private void SendGeneratedCbrs()
         {
             List<Cbr> cbrs = cbrManager.GetCbrsNotBeenSent();
             foreach (var cbr in cbrs)
@@ -80,18 +91,47 @@ namespace DIS.Business.Proxy
                 try
                 {
                     cbr.MsReportUniqueId = msClient.ReportCbr(cbr);
-                    cbrManager.UpdateCbrAfterReported(cbr);
-                    base.UpdateKeysAfterReportBinding(cbr);
+                    UpdateCbrAfterReported(cbr);
                 }
                 catch (Exception ex)
                 {
+                    cbrManager.UpdateCbrIfSendingFailed(cbr);
                     ExceptionHandler.HandleException(ex);
                 }
             }
         }
 
+        private void SearchSubmittedCbr()
+        {
+            Cbr cbr = cbrManager.GetFirstSentCbr();
+            if (cbr != null)
+            {
+                Cbr submittedCbr = msClient.SearchSubmittedCbr(cbr);
+                if (submittedCbr == null)
+                {
+                    cbrManager.UpdateCbrIfSearchResultEmpty(cbr);
+                }
+                else
+                {
+                    cbr.MsReportUniqueId = submittedCbr.MsReportUniqueId;
+                    cbr.MsReceivedDateUtc = submittedCbr.MsReceivedDateUtc;
+                    UpdateCbrAfterReported(cbr);
+                }
+            }
+        }
+
+        private void UpdateCbrAfterReported(Cbr cbr)
+        {
+            using (KeyStoreContext context = KeyStoreContext.GetContext())
+            {
+                cbrManager.UpdateCbrAfterReported(cbr, context);
+                UpdateKeysAfterReportBinding(cbr, context);
+                context.SaveChanges();
+            }
+        }
+
         //get CBR.Ack from MS in the background 
-        public void RetrieveCbrAcks()
+        private void RetrieveCbrAcks()
         {
             List<Cbr> cbrs = cbrManager.GetReportedCbrs()
                 .Where(c => c.MsReportUniqueId.HasValue).ToList();
@@ -158,6 +198,12 @@ namespace DIS.Business.Proxy
                     IgnoreException(SendKeySyncNotifications);
                     break;
             }
+        }
+
+        public void SearchSubmitted()
+        {
+            SearchSubmittedCbr();
+            SearchSubmittedReturnReport();
         }
 
         #endregion

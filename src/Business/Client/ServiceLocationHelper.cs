@@ -54,6 +54,7 @@ namespace DIS.Business.Client
         public string RetrieveFulfilmentUrl { get { return GetUrl("fulfillments/?status=ready"); } }
         public string ReportBindingUrl { get { return GetUrl("computerbuildreport/"); } }
         public string CBRAckUrl { get { return GetUrl("computerbuildreport/acknowledgements"); } }
+        public string CBRSearchUrl { get { return GetUrl("computerbuildreport/royd/v1"); } }
 
         public string GetKeysUrl { get { return GetUrl("Keys/Get"); } }
         public string ReportKeysUrl { get { return GetUrl("Keys/Report"); } }
@@ -67,6 +68,7 @@ namespace DIS.Business.Client
 
         public string ReportReturnUrl { get { return GetUrl("return/"); } }
         public string ReturnAckUrl { get { return GetUrl("return/acknowledgements"); } }
+        public string ReturnSearchUrl { get { return GetUrl("return/royd/v1"); } }
 
         public string SyncUrl { get { return GetUrl("Sync"); } }
 
