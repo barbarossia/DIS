@@ -111,6 +111,24 @@ namespace DIS.Services.TransferWebService
                 serviceClient.RetrievReturnReportAck(request));
         }
 
+        public Guid ReportOhr(Ohr request)
+        {
+            return HandleException<Guid>(MessageLogger.GetMethodName(), () =>
+                serviceClient.ReportOhr(request));
+        }
+
+        public Guid[] RetrieveOhrAcks()
+        {
+            return HandleException<Guid[]>(MessageLogger.GetMethodName(), () =>
+            serviceClient.RetrieveOhrAcks());
+        }
+
+        public Ohr RetrieveOhrAck(Ohr ohr)
+        {
+            return HandleException<Ohr>(MessageLogger.GetMethodName(), () =>
+                serviceClient.RetrieveOhrAck(ohr));
+        }
+
         #endregion
 
         #region ULS web services
@@ -145,6 +163,16 @@ namespace DIS.Services.TransferWebService
         public void KeyProviderServiceReport()
         {
             Global.KpsLastReportTime = DateTime.Now;
+        }
+
+        public bool TestDatabaseDiskFull()
+        {
+            return CheckDatabaseDiskFullError();
+        }
+
+        public void DatabaseDiskFullReport(bool isFull)
+        {
+            Global.IsDatabaseDiskFull = isFull;
         }
 
         /// <summary>
@@ -263,6 +291,11 @@ namespace DIS.Services.TransferWebService
             if (elplseTime.TotalMilliseconds > reportCheckInterval)
                 throw new WebProtocolException(HttpStatusCode.InternalServerError);
         }
+
+        private bool CheckDatabaseDiskFullError()
+        {
+            return Global.IsDatabaseDiskFull;
+        }
     }
 
     public static class Global
@@ -272,6 +305,7 @@ namespace DIS.Services.TransferWebService
         /// </summary>
         static DateTime dpsLastReportTime;
         static DateTime kpsLastReportTime;
+        static bool isDatabaseDiskFull;
 
         /// <summary>
         /// Get or set the static important data.
@@ -300,6 +334,18 @@ namespace DIS.Services.TransferWebService
             set
             {
                 kpsLastReportTime = value;
+            }
+        }
+
+        public static bool IsDatabaseDiskFull
+        {
+            get
+            {
+                return isDatabaseDiskFull;
+            }
+            set
+            {
+                isDatabaseDiskFull = value;
             }
         }
     }

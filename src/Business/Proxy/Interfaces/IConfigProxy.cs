@@ -33,8 +33,12 @@ namespace DIS.Business.Proxy
 
         DiagnosticResult TestKeyProviderService();
 
+        DiagnosticResult TestDatabaseDiskFull();
+
         void DataPollingServiceReport();
 
         void KeyProviderServiceReport();
+
+        void DatabaseDiskFullReport();
     }
 }

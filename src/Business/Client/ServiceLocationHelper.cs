@@ -49,6 +49,8 @@ namespace DIS.Business.Client
         public string TestKPS { get { return GetUrl("Diagnostic/KPS"); } }
         public string DPSReport { get { return GetUrl("Diagnostic/DPS/Report"); } }
         public string KPSReport { get { return GetUrl("Diagnostic/KPS/Report"); } }
+        public string TestDDF { get { return GetUrl("Diagnostic/DatabaseDiskFull"); } }
+        public string DDFReport { get { return GetUrl("Diagnostic/DatabaseDiskFull/Report"); } }
 
         public string GetFulfilledKeysUrl { get { return GetUrl("fulfillments"); } }
         public string RetrieveFulfilmentUrl { get { return GetUrl("fulfillments/?status=ready"); } }
@@ -71,6 +73,9 @@ namespace DIS.Business.Client
         public string ReturnSearchUrl { get { return GetUrl("return/royd/v1"); } }
 
         public string SyncUrl { get { return GetUrl("Sync"); } }
+
+        public string ReportOhrUrl { get { return GetUrl("oemhardwarereporting/royd/v1/"); } }
+        public string OhrAckUrl { get { return GetUrl("oemhardwarereporting/royd/v1/acknowledgements"); } }
 
         #endregion
 

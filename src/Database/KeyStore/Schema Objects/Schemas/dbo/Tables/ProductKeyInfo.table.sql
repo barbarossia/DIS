@@ -34,7 +34,13 @@
     [ZPGM_ELIG_VALUES]           NVARCHAR (48)    NULL,
     [ZOEM_EXT_ID]                NVARCHAR (16)    NULL,
     [ZCHANNEL_REL_ID]            NVARCHAR (32)       NULL,
-    [TrackingInfo]               NVARCHAR (1024)  NULL
+	[ZFRM_FACTOR_CL1]            nvarchar (64) NULL,
+    [ZFRM_FACTOR_CL2]            nvarchar (64) NULL,
+    [ZSCREEN_SIZE]               nvarchar (32) NULL,
+    [ZTOUCH_SCREEN]              nvarchar (32) NULL,
+    [TrackingInfo]               NVARCHAR (1024)  NULL,
+	[Tags] [nvarchar](200) NULL,
+	[Description] [nvarchar](500) NULL,
 );
 
 

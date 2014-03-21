@@ -28,6 +28,7 @@ namespace DIS.Data.DataContract
             this.KeyOperationHistories = new List<KeyOperationHistory>();
             this.CbrKeys = new List<CbrKey>();
             this.ReturnReportKeys = new List<ReturnReportKey>();
+            this.OHRDataUpdateKeys = new List<OhrKey>();
         }
 
         [DataMember, DatabaseGenerated(DatabaseGeneratedOption.None)]
@@ -110,6 +111,7 @@ namespace DIS.Data.DataContract
         public ICollection<CbrKey> CbrKeys { get; set; }
         public ICollection<ReturnReportKey> ReturnReportKeys { get; set; }
         public ICollection<KeyOperationHistory> KeyOperationHistories { get; set; }
+        public ICollection<OhrKey> OHRDataUpdateKeys { get; set; }
 
         [DataMember, NotMapped]
         public KeyState KeyState { get;  set; }
@@ -131,6 +133,28 @@ namespace DIS.Data.DataContract
             {
                 DateTimeOffset offset = new DateTimeOffset(FulfilledDateUtc.Value, TimeZoneInfo.Utc.GetUtcOffset(FulfilledDateUtc.Value));
                 return offset.LocalDateTime;
+            }
+        }
+
+        public void UpdateOhrData(string name, string value)
+        {
+            switch (name)
+            {
+                case OemOptionalInfo.ZFrmFactorCl1Name:
+                    ZFRM_FACTOR_CL1 = value;
+                    break;
+                case OemOptionalInfo.ZFrmFactorCl2Name:
+                    ZFRM_FACTOR_CL2 = value;
+                    break;
+                case OemOptionalInfo.ZTouchScreenName:
+                    ZTOUCH_SCREEN = value;
+                    break;
+                case OemOptionalInfo.ZScreenSizeName:
+                    ZSCREEN_SIZE = value;
+                    break;
+                case OemOptionalInfo.ZPcModelSkuName:
+                    ZPC_MODEL_SKU = value;
+                    break;
             }
         }
     }

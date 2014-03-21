@@ -197,7 +197,10 @@ namespace DIS.Business.Library
             if (returndb == null)
                 returnKeyRepository.InsertReturnReportAndKeys(returnReport);
             else
-                returnKeyRepository.UpdateReturnReport(returnReport);
+            {
+                returnReport.ReturnReportKeys = null;
+                returnKeyRepository.UpdateReturnKeyAck(returnReport, null);
+            }
         }
 
         public long[] UpdateKeyStateAfterRecieveSyncNotification(List<KeySyncNotification> keySyncNotifications)
@@ -440,6 +443,26 @@ namespace DIS.Business.Library
                     try
                     {
                         key.UlsReportingBoundKeyToMs();
+                    }
+                    catch (Exception ex)
+                    {
+                        ExceptionHandler.HandleException(ex);
+                    }
+                }
+                keyRepository.UpdateKeys(keys, false, null, context: context);
+            }
+        }
+
+        protected void UpdateKeysAfterReportOhr(Ohr ohr, KeyStoreContext context)
+        {
+            List<KeyInfo> keys = GetKeysInDb(ohr.Keys.Select(k => k.KeyId));
+            if (keys != null && keys.Count > 0)
+            {
+                foreach (KeyInfo key in keys)
+                {
+                    try
+                    {
+                        key.UlsReportingOhrToMs();
                     }
                     catch (Exception ex)
                     {

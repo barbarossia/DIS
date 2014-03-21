@@ -85,9 +85,11 @@
   <ItemGroup>
     <Compile Include="CbrManager.cs" />
     <Compile Include="ConfigManager.cs" />
+    <Compile Include="OhrManager.cs" />
     <Compile Include="DisException.cs" />
     <Compile Include="FulfillmentManager.cs" />
     <Compile Include="HeadQuarterManager.cs" />
+    <Compile Include="Interfaces\IOhrManager.cs" />
     <Compile Include="Interfaces\ICbrManager.cs" />
     <Compile Include="Interfaces\IConfigManager.cs" />
     <Compile Include="Interfaces\IFulfillmentManager.cs" />

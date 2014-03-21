@@ -38,18 +38,23 @@ namespace DIS.Business.Proxy
         }
         private IConfigManager configManager;
         private ICbrManager cbrManager;
+        private IOhrManager ohrManager;
         private IFulfillmentManager fulfillManager;
         private ISubsidiaryManager subsidiaryManager;
         private IHeadQuarterManager headQuarterManager;
         private User user;
 
         public KeyProxy(User user, int? hqId)
-            : this(user, hqId, null, null, null, null, null)
+            : this(user, hqId, null, null, null, null, null, null)
         {
         }
 
         public KeyProxy(User user, int? hqId, IConfigManager configManager,
-            ICbrManager cbrManager, IFulfillmentManager fulfillManager, ISubsidiaryManager subsidiaryManager, IHeadQuarterManager headQuarterManager)
+            ICbrManager cbrManager, 
+            IFulfillmentManager fulfillManager, 
+            ISubsidiaryManager subsidiaryManager, 
+            IHeadQuarterManager headQuarterManager,
+            IOhrManager ohrManager)
             : base(hqId)
         {
             this.user = user;
@@ -78,6 +83,11 @@ namespace DIS.Business.Proxy
                 this.headQuarterManager = new HeadQuarterManager();
             else
                 this.headQuarterManager = headQuarterManager;
+
+            if (ohrManager == null)
+                this.ohrManager = new OhrManager();
+            else
+                this.ohrManager = ohrManager;
         }
 
         #endregion
@@ -106,6 +116,16 @@ namespace DIS.Business.Proxy
         public List<FulfillmentInfo> GetFailedFulfillments(bool shouldIncludeExpired)
         {
             return fulfillManager.GetFailedFulfillments(shouldIncludeExpired);
+        }
+
+        public List<Ohr> GetConfirmedOhrs()
+        {
+            return ohrManager.GetConfirmedOhrs();
+        }
+
+        public void UpdateOhrAfterNotification(List<Ohr> ohrs)
+        {
+            ohrManager.UpdateOhrAfterNotification(ohrs);
         }
 
         #endregion

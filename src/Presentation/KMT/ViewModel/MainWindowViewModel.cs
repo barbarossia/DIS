@@ -42,6 +42,7 @@ using DIS.Presentation.KMT.Views.Key.RevertKeysView;
 using DIS.Presentation.KMT.Views.Key.UnAssignKeysView;
 using DIS.Presentation.KMT.Views.Notification;
 using Microsoft.CSharp.RuntimeBinder;
+using DIS.Presentation.KMT.Views.Key.OhrDataUpdateView;
 
 namespace DIS.Presentation.KMT.ViewModel
 {
@@ -214,6 +215,7 @@ namespace DIS.Presentation.KMT.ViewModel
         private ICommand reportKeysCommand;
         private ICommand markAllocatedCommand;
         private ICommand assignKeysCommand;
+        private ICommand ohrKeysCommand;
         private ICommand unassignKeysCommand;
         private ICommand recallKeysCommand;
         private ICommand returnKeysCommand;
@@ -457,6 +459,14 @@ namespace DIS.Presentation.KMT.ViewModel
             {
                 isUlsEnableAndManager = value;
                 RaisePropertyChanged("IsUlsEnableAndManager");
+            }
+        }
+
+        public bool IsUlsEnabledAndInDeCentralizeModeAndManager
+        {
+            get
+            {
+                return IsManager && (KmtConstants.IsOemCorp || (KmtConstants.IsTpiCorp && KmtConstants.CurrentHeadQuarter != null && !KmtConstants.CurrentHeadQuarter.IsCentralizedMode));
             }
         }
 
@@ -713,6 +723,19 @@ namespace DIS.Presentation.KMT.ViewModel
                 if (assignKeysCommand == null)
                     assignKeysCommand = new DelegateCommand(OnAssignKeys);
                 return assignKeysCommand;
+            }
+        }
+
+        /// <summary>
+        /// Ohr data update Command Object
+        /// </summary>
+        public ICommand OhrCommand
+        {
+            get
+            {
+                if (ohrKeysCommand == null)
+                    ohrKeysCommand = new DelegateCommand(OnOhrKeys);
+                return ohrKeysCommand;
             }
         }
 
@@ -1068,6 +1091,16 @@ namespace DIS.Presentation.KMT.ViewModel
                 OnRefreshKeys();
         }
 
+        private void OnOhrKeys()
+        {
+            OhrDataUpdateWizard ohrWizard = new OhrDataUpdateWizard(keyProxy);
+            ohrWizard.Owner = View;
+            ohrWizard.ShowDialog();
+
+            if (ohrWizard.btnFinish.Visibility == Visibility.Visible)
+                OnRefreshKeys();
+        }
+
         private void OnUnassignKeys()
         {
             UnAssignKeysWizard unAssignWizard = new UnAssignKeysWizard(keyProxy, ssProxy);
@@ -1251,6 +1284,8 @@ namespace DIS.Presentation.KMT.ViewModel
             notificationWindow.VM.Check += new NotificationEventHandler(CheckKeysExpired);
             notificationWindow.VM.Check += new NotificationEventHandler(CheckKeyTypeConfigurations);
             notificationWindow.VM.Check += new NotificationEventHandler(CheckOhrData);
+            notificationWindow.VM.Check += new NotificationEventHandler(CheckDatabaseDiskFull);
+            notificationWindow.VM.Check += new NotificationEventHandler(CheckConfirmedOhrKeys);
             RegisterSystemCheck(configProxy.GetIsAutoDiagnostic());
         }
 
@@ -1424,6 +1459,61 @@ namespace DIS.Presentation.KMT.ViewModel
                         e.Push(new Notification(category,
                             string.Format(MergedResources.KeyManagementViewModel_OldTimelineExceedMessage, keysExpired.Count),
                             typeof(KeysExpiredNotificationView), null, keysExpired, KmtConstants.OldTimeline));
+                    else
+                        e.Pop(category);
+                });
+            }
+            catch (Exception ex)
+            {
+                MessageLogger.LogSystemError(MessageLogger.GetMethodName(), ex.GetTraceText());
+            }
+        }
+
+        private void CheckConfirmedOhrKeys(object sender, NotificationEventArgs e)
+        {
+            try
+            {
+                NotificationCategory category = NotificationCategory.ConfirmedOhrs;
+                List<Ohr> ohrs = keyProxy.GetConfirmedOhrs();
+                Dispatch(() =>
+                {
+                    if (ohrs.Count > 0)
+                        e.Push(new Notification(category,
+                            ResourcesOfRTMv1_8.OhrUpdateViewModel_Message,
+                            typeof(OhrKeysNotificationView), 
+                            () => 
+                                {
+                                    keyProxy.UpdateOhrAfterNotification(ohrs);
+                                }, ohrs, keyProxy));
+                    else
+                        e.Pop(category);
+                });
+            }
+            catch (Exception ex)
+            {
+                MessageLogger.LogSystemError(MessageLogger.GetMethodName(), ex.GetTraceText());
+            }
+        }
+
+        private void CheckDatabaseDiskFull(object sender, NotificationEventArgs e)
+        {
+            try
+            {
+                NotificationCategory category = NotificationCategory.SystemError_DabaseDiskFull;
+                DiagnosticResult result = configProxy.TestDatabaseDiskFull();
+                Dispatch(() =>
+                {
+                    if (result.DiagnosticResultType == DiagnosticResultType.Error)
+                    {
+                        Notification no = new Notification(category,
+                            ResourcesOfRTMv1_8.Notification_DatabaseDiskFull,
+                            null, () => {
+                                configProxy.DatabaseDiskFullReport();
+                                e.Pop(category);
+                            }, null);
+                        no.ButtonContent = MergedResources.Common_Clear;
+                        e.Push(no);
+                    }
                     else
                         e.Pop(category);
                 });

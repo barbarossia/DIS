@@ -71,7 +71,7 @@
                         <Label x:Uid="lblzScreenSize" Content="{x:Static res:ResourcesOfRTMv1_6.EditOptionalInfo_ScreenSizeName}" Style="{StaticResource LblNormalSty}"/>
                         <TextBox x:Uid="txtzScreenSize" Margin="10,2,5,2" x:Name="txtzScreenSize" Text="{Binding ZSCREEN_SIZE, Mode=TwoWay}"  MaxLength="32" Behaviors:TextBoxFilters.IsAlphaNumericFilter="True" Style="{StaticResource TxtNormalSty}"/>
                         <Label x:Uid="lblzTouchScreen" Content="{x:Static res:ResourcesOfRTMv1_6.EditOptionalInfo_TouchScreenName}" Style="{StaticResource LblNormalSty}"/>
-                        <ComboBox  x:Uid="cbotouchScreen"  x:Name="drpTouchScreen" Margin="10,2,5,2"   ItemsSource="{Binding ZTOUCH_SCREENs}" SelectedItem="{Binding SelectedZTOUCH_SCREEN, Mode=TwoWay}" Style="{StaticResource CboNormalSty}" MinWidth="180" FontSize="12"/>
+                        <ComboBox  x:Uid="cbotouchScreen"  x:Name="drpTouchScreen" Margin="10,2,5,2"   ItemsSource="{Binding ZTOUCH_SCREENs}" SelectedItem="{Binding SelectedZTOUCH_SCREEN, Mode=TwoWay,Converter={StaticResource touchScreenEnumConverter}}" Style="{StaticResource CboNormalSty}" MinWidth="180" FontSize="12"/>
                         <Label x:Uid="lblTrakingInfo" Content="{x:Static res:MergedResources.Common_TrackingInfo}" Style="{StaticResource LblNormalSty}"/>
                         <TextBox x:Uid="txtTrakingInfo" Margin="10,2,5,2" x:Name="txtTrakingInfo" Text="{Binding TrakingInfo, Mode=TwoWay}" Style="{StaticResource TxtNormalSty}"/>
                     </StackPanel>
@@ -80,8 +80,8 @@
                     <StackPanel Margin="0,10">
                         <!--<Label x:Uid="lblAssignedTo" Content="{x:Static res:MergedResources.Common_ColumnAssignedTo}" Style="{StaticResource LblNormalSty}"/>
                         <ComboBox x:Uid="cboTpis" ItemsSource="{Binding Subsidiarys}"  DisplayMemberPath="CustomerNumber" SelectedItem="{Binding SelectedSubSidiary, Mode=TwoWay}" Style="{StaticResource CboNormalSty}"/>-->
-                        <Label x:Uid="lblProductKeyID" Content="Product Key ID:" Style="{StaticResource LblNormalSty}"/>
-                        <TextBox x:Uid="txtProductKeyID" Margin="10,2,5,2" x:Name="ProductKeyID" Text="{Binding ProductKeyID, Mode=TwoWay}"  MaxLength="30" Style="{StaticResource TxtNormalSty}"/>
+                        <!--<Label x:Uid="lblProductKeyID" Content="Product Key ID:" Style="{StaticResource LblNormalSty}"/>
+                        <TextBox x:Uid="txtProductKeyID" Margin="10,2,5,2" x:Name="ProductKeyID" Text="{Binding ProductKeyID, Mode=TwoWay}"  MaxLength="30" Style="{StaticResource TxtNormalSty}"/>-->
                         
                         <Label x:Uid="lblProductKeyIDFrom" Content="Product Key ID From:" Style="{StaticResource LblNormalSty}"/>
                         <TextBox x:Uid="txtProductKeyIDFrom" Margin="10,2,5,2" x:Name="ProductKeyIDFrom" Text="{Binding ProductKeyIDFrom, Mode=TwoWay}"  MaxLength="30" Style="{StaticResource TxtNormalSty}"/>

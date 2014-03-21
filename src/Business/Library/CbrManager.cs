@@ -100,6 +100,8 @@ namespace DIS.Business.Library
             string shipTo = keys.First().ShipToCustomerId;
             if (keys.Any(k => k.ShipToCustomerId != shipTo))
                 throw new ApplicationException("Keys are not shipped to the same customer.");
+            
+            keys.ForEach(k => CheckCbrTouchScreenValue(k));
 
             Guid customerReportId = Guid.NewGuid();
             Cbr cbr = new Cbr()
@@ -123,16 +125,7 @@ namespace DIS.Business.Library
         public string GenerateCbrToFile(List<KeyInfo> keys, string outputPath)
         {
             var cbr = GenerateCbr(keys, true);
-            return SaveCbrToFile(cbr, outputPath);
-        }
-
-        private string SaveCbrToFile(Cbr cbr, string outputPath)
-        {
-            Serializer.WriteToXml(cbr.ToBindingReport(), outputPath);
-            string fileName = Path.GetFileName(outputPath);
-            XmlDocument xDoc = new XmlDocument();
-            xDoc.Load(outputPath);
-            return xDoc.DocumentElement.OuterXml;
+            return KeyManagerHelper.SaveServiceContractToFile(cbr.ToBindingReport(), outputPath);
         }
 
         public void UpdateCbrIfSendingFailed(Cbr cbr)
@@ -277,6 +270,21 @@ namespace DIS.Business.Library
                 xmldoc = xmldoc.Replace("ComputerBuildReportAckResponse", "ComputerBuildReportAck");
             }
             return xmldoc;
+        }
+
+        private void CheckCbrTouchScreenValue(KeyInfo key)
+        {
+            if (!string.IsNullOrEmpty(key.ZTOUCH_SCREEN))
+            {
+                try
+                {
+                    OemOptionalInfo.ConvertTouchEnum(key.ZTOUCH_SCREEN);
+                }
+                catch
+                {
+                    throw;
+                }
+            }
         }
     }
 }

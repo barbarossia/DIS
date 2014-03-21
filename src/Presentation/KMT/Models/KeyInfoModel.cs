@@ -51,6 +51,67 @@ namespace DIS.Presentation.KMT.Models
             }
         }
 
+        public string ZFRM_FACTOR_CL1
+        {
+            get 
+            {
+                return keyInfo.ZFRM_FACTOR_CL1; 
+            }
+            set
+            {
+                keyInfo.ZFRM_FACTOR_CL1 = value;
+                if (PropertyChanged != null)
+                    PropertyChanged(this, new PropertyChangedEventArgs("ZFRM_FACTOR_CL1"));
+                if (ZfrmFactorCl1PropertyChanged != null)
+                    ZfrmFactorCl1PropertyChanged(this, new ZfrmFactorCl1PropertyChangedEventArgs(value));
+            }
+        }
+
+        public string ZFRM_FACTOR_CL2
+        {
+            get { return keyInfo.ZFRM_FACTOR_CL2; }
+            set
+            {
+                keyInfo.ZFRM_FACTOR_CL2 = value;
+                if (PropertyChanged != null)
+                    PropertyChanged(this, new PropertyChangedEventArgs("ZFRM_FACTOR_CL2"));
+            }
+        }
+        public string ZTOUCH_SCREEN
+        {
+            get { return keyInfo.ZTOUCH_SCREEN; }
+            set
+            {
+                keyInfo.ZTOUCH_SCREEN = value;
+                if (PropertyChanged != null)
+                    PropertyChanged(this, new PropertyChangedEventArgs("ZTOUCH_SCREEN"));
+            }
+        }
+
+        public string ZSCREEN_SIZE
+        {
+            get { return keyInfo.ZSCREEN_SIZE; }
+            set
+            {
+                keyInfo.ZSCREEN_SIZE = value;
+                if (PropertyChanged != null)
+                    PropertyChanged(this, new PropertyChangedEventArgs("ZSCREEN_SIZE"));
+            }
+        }
+
+        public string ZPC_MODEL_SKU
+        {
+            get { return keyInfo.ZPC_MODEL_SKU; }
+            set
+            {
+                keyInfo.ZPC_MODEL_SKU = value;
+                if (PropertyChanged != null)
+                    PropertyChanged(this, new PropertyChangedEventArgs("ZPC_MODEL_SKU"));
+            }
+        }
+
         public event PropertyChangedEventHandler PropertyChanged;
+        public event ZfrmFactorCl1PropertyChangedEventHandle ZfrmFactorCl1PropertyChanged;
+
     }
 }

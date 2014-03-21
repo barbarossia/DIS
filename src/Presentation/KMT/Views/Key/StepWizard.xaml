@@ -5,7 +5,7 @@
         xmlns:Behaviors="clr-namespace:DIS.Presentation.KMT.Behaviors"
         xmlns:res="clr-namespace:DIS.Presentation.KMT.Properties"
         Title="{Binding WindowTitle}" 
-        Height="640" 
+        Height="720" 
         Width="950"
         ResizeMode="NoResize" 
         WindowStartupLocation="CenterScreen">

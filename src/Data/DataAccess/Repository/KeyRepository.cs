@@ -373,9 +373,9 @@ namespace DIS.Data.DataAccess.Repository
             }
         }
 
-        public void UpdateKeys(List<KeyInfo> keys)
+        public void UpdateKeys(List<KeyInfo> keys, KeyStoreContext context = null)
         {
-            using (var context = GetContext())
+            UsingContext(ref context, () =>
             {
                 context.Configuration.AutoDetectChangesEnabled = false;
 
@@ -403,8 +403,9 @@ namespace DIS.Data.DataAccess.Repository
                 var tmp = (from dbKey in dbKeys
                            join key in keys on dbKey.KeyId equals key.KeyId
                            select updateKey(dbKey, key)).ToList();
-                context.SaveChanges();
-            }
+
+                context.Configuration.AutoDetectChangesEnabled = true;
+            });
         }
 
         public void UpdateKeys(List<KeyInfo> keys, bool? isInProgress, int? ssId, bool shouldUpdateSsIdIfNull = false, bool? shouldCarbonCopy = null, KeyStoreContext context = null)

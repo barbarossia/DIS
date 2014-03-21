@@ -234,7 +234,7 @@ CREATE TABLE [dbo].[ProductKeyInfo](
     [ProductKeyID] [bigint] NOT NULL,
     [ProductKey] [nvarchar](50) NULL,
     [ProductKeyStateID] [tinyint] NOT NULL,
-    [ProductKeyState] [nvarchar](20) NULL,
+    [ProductKeyState] [nvarchar](30) NULL,
     [HardwareID] [nvarchar](512) NULL,
     [OEMPartNumber] [nvarchar](35) NULL,
     [SoldToCustomerName] [nvarchar](80) NULL,
@@ -375,7 +375,7 @@ CREATE NONCLUSTERED INDEX [IX_ProductKeyInfo_ZSCREEN_SIZE] ON [dbo].[ProductKeyI
 WHERE ([ZSCREEN_SIZE] IS NOT NULL)
 WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, SORT_IN_TEMPDB = OFF, IGNORE_DUP_KEY = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]
 GO
-CREATE NONCLUSTERED INDEX [ZTOUCH_SCREEN] ON [dbo].[ProductKeyInfo] 
+CREATE NONCLUSTERED INDEX [IX_ProductKeyInfo_ZTOUCH_SCREEN] ON [dbo].[ProductKeyInfo] 
 (
     [ZTOUCH_SCREEN] ASC
 )
@@ -777,7 +777,7 @@ SET QUOTED_IDENTIFIER ON
 GO
 CREATE TABLE [dbo].[KeyState](
 	[KeyStateId] [tinyint] NOT NULL,
-	[KeyState] [nvarchar](20) NOT NULL,
+	[KeyState] [nvarchar](30) NOT NULL,
  CONSTRAINT [PK_KeyState] PRIMARY KEY CLUSTERED 
 (
 	[KeyStateId] ASC
@@ -797,7 +797,7 @@ INSERT [dbo].[KeyState] ([KeyStateId], [KeyState]) VALUES (9, N'ActivationEnable
 INSERT [dbo].[KeyState] ([KeyStateId], [KeyState]) VALUES (10, N'ActivationDenied')
 INSERT [dbo].[KeyState] ([KeyStateId], [KeyState]) VALUES (11, N'Assigned')
 INSERT [dbo].[KeyState] ([KeyStateId], [KeyState]) VALUES (12, N'Retrieved')
-
+INSERT [dbo].[KeyState] ([KeyStateId],[KeyState])  VALUES (13, N'ActivationEnabledPendingUpdate')
 GO
 
 
@@ -961,4 +961,52 @@ ALTER TABLE [dbo].[DuplicatedKey]  WITH CHECK ADD  CONSTRAINT [FK_DuplicatedKey_
 REFERENCES [dbo].[ProductKeyInfo] ([ProductKeyID])
 GO
 ALTER TABLE [dbo].[DuplicatedKey] CHECK CONSTRAINT [FK_DuplicatedKey_ProductKeyInfo]
+GO
+CREATE TABLE [dbo].[DataUpdateReport](
+	[MSUpdateUniqueID] [uniqueidentifier] NULL,
+	[CustomerUpdateUniqueID] [uniqueidentifier] NOT NULL,
+	[MSReceivedDateUTC] [datetime] NULL,
+	[SoldToCustomerID] [nvarchar](10) NOT NULL,
+	[ReceivedFromCustomerID] [nvarchar](10) NOT NULL,
+	[TotalLineItems] [int] NULL,
+	[OHRStatus] [int] NOT NULL,
+	[CreatedDateUTC] [datetime] NOT NULL,
+	[ModifiedDateUTC] [datetime] NOT NULL,
+ CONSTRAINT [PK_ OHRDataUpdate] PRIMARY KEY CLUSTERED 
+(
+	[CustomerUpdateUniqueID] ASC
+)WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]
+) ON [PRIMARY]
+
+GO
+
+CREATE TABLE [dbo].[DataUpdateReportKey](
+	[CustomerUpdateUniqueID] [uniqueidentifier] NOT NULL,
+	[ProductKeyID] [bigint] NOT NULL,
+	[Name] [nvarchar](50) NOT NULL,
+	[Value] [nvarchar](80) NOT NULL,
+	[ReasonCode] [nvarchar](4) NULL,
+	[ReasonCodeDescription] [nvarchar](160) NULL,
+ CONSTRAINT [PK_OHRDataUpdateKey] PRIMARY KEY CLUSTERED 
+(
+	[CustomerUpdateUniqueID] ASC,
+	[ProductKeyID] ASC,
+	[Name] ASC
+)WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]
+) ON [PRIMARY]
+
+GO
+
+ALTER TABLE [dbo].[DataUpdateReportKey]  WITH NOCHECK ADD  CONSTRAINT [FK_OHRDataUpdateKey_OHRDataUpdate] FOREIGN KEY([CustomerUpdateUniqueID])
+REFERENCES [dbo].[DataUpdateReport] ([CustomerUpdateUniqueID])
+GO
+
+ALTER TABLE [dbo].[DataUpdateReportKey] CHECK CONSTRAINT [FK_OHRDataUpdateKey_OHRDataUpdate]
+GO
+
+ALTER TABLE [dbo].[DataUpdateReportKey]  WITH NOCHECK ADD  CONSTRAINT [FK_OHRDataUpdateKey_ProductKeyInfo] FOREIGN KEY([ProductKeyID])
+REFERENCES [dbo].[ProductKeyInfo] ([ProductKeyID])
+GO
+
+ALTER TABLE [dbo].[DataUpdateReportKey] CHECK CONSTRAINT [FK_OHRDataUpdateKey_ProductKeyInfo]
 GO

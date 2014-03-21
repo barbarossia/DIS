@@ -68,6 +68,15 @@
     <Compile Include="Contracts\Reporting\ComputerBuildReportAckResponse.cs" />
     <Compile Include="Contracts\Reporting\ComputerBuildReportRequest.cs" />
     <Compile Include="Contracts\Reporting\ComputerBuildReportResponse.cs" />
+    <Compile Include="Contracts\Reporting\DataUpdateResult.cs" />
+    <Compile Include="Contracts\Reporting\DataUpdateAck.cs" />
+    <Compile Include="Contracts\Reporting\DataUpdateResponse.cs" />
+    <Compile Include="Contracts\Reporting\DataUpdateLineItem.cs" />
+    <Compile Include="Contracts\Reporting\FormFactorL1Enum.cs" />
+    <Compile Include="Contracts\Reporting\FormFactorL2Enum.cs" />
+    <Compile Include="Contracts\Reporting\OEMHardwareReport.cs" />
+    <Compile Include="Contracts\Reporting\OEMHardwareReportError.cs" />
+    <Compile Include="Contracts\Reporting\DataUpdateRequest.cs" />
     <Compile Include="Contracts\Reporting\ReturnSearchSubmittedResponse.cs" />
     <Compile Include="Contracts\Reporting\CbrSearchSubmittedResponse.cs" />
     <Compile Include="Contracts\Reporting\FailedValidationResult.cs" />
@@ -83,6 +92,7 @@
     <Compile Include="Contracts\Reporting\ReturnRequest.cs" />
     <Compile Include="Contracts\Reporting\ReturnResponse.cs" />
     <Compile Include="Contracts\Reporting\SuccessfulValidationResult.cs" />
+    <Compile Include="Contracts\Reporting\TouchEnum.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TypeConversionExtension.cs" />
   </ItemGroup>

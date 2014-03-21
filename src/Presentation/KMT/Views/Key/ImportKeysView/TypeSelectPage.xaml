@@ -48,7 +48,7 @@
                 <Grid.RowDefinitions>
                     <RowDefinition  Height="Auto"/>
                 </Grid.RowDefinitions>
-                <RadioButton x:Uid="rbimportCBR"   IsChecked="{Binding Path=IsCBRChecked,Converter={StaticResource boolToVis}}"  Visibility="{Binding Path=RbCBRVisibility,Converter={StaticResource boolToVis}}" Content="{x:Static res:MergedResources.Import_CBRAckTxt}" IsEnabled="{Binding IsMSEnable}" Grid.Row="0" Margin="30,0,0,0"  GroupName="ExportType" Style="{StaticResource RbNormalSty}"/>
+                <RadioButton x:Uid="rbimportCBR" Grid.Row="0"  IsChecked="{Binding Path=IsCBRChecked,Converter={StaticResource boolToVis}}"  Visibility="{Binding Path=RbCBRVisibility,Converter={StaticResource boolToVis}}" Content="{x:Static res:MergedResources.Import_CBRAckTxt}" IsEnabled="{Binding IsMSEnable}"  Margin="30,0,0,0"  GroupName="ExportType" Style="{StaticResource RbNormalSty}"/>
             </Grid>
         </GroupBox>
         <GroupBox Header="{x:Static res:MergedResources.Offline_DuplicateCBRTit}" Grid.Row="5"  Margin="20,1,20,0" Visibility="{Binding Path=RbDuplicateCBRVisibility,Converter={StaticResource boolToVis}}">

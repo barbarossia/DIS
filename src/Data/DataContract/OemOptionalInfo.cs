@@ -20,28 +20,31 @@ using System.Xml.Linq;
 using System.Runtime.Serialization;
 using System.Xml.Serialization;
 using System.Xml.Schema;
+using System.Text.RegularExpressions;
 
 namespace DIS.Data.DataContract
 {
     public class OemOptionalInfo : IXmlSerializable
     {
-        private const string zPcModelSkuName = "ZPC_MODEL_SKU";
-        private const string zOemExtIdName = "ZOEM_EXT_ID";
-        private const string zManufGeoLocName = "ZMANUF_GEO_LOC";
-        private const string zPgmEligValuesName = "ZPGM_ELIG_VAL";
-        private const string zChannelRelIdName = "ZCHANNEL_REL_ID";
+        public const string ZPcModelSkuName = "ZPC_MODEL_SKU";
+        public const string ZOemExtIdName = "ZOEM_EXT_ID";
+        public const string ZManufGeoLocName = "ZMANUF_GEO_LOC";
+        public const string ZPgmEligValuesName = "ZPGM_ELIG_VAL";
+        public const string ZChannelRelIdName = "ZCHANNEL_REL_ID";
         //new add for V1.6
-        private const string zFrmFactorCl1 = "ZFRM_FACTOR_CL1";
-        private const string zFrmFactorCl2 = "ZFRM_FACTOR_CL2";
-        private const string zScreenSize = "ZSCREEN_SIZE";
-        private const string zTouchScreen = "ZTOUCH_SCREEN";
+        public const string ZFrmFactorCl1Name = "ZFRM_FACTOR_CL1";
+        public const string ZFrmFactorCl2Name = "ZFRM_FACTOR_CL2";
+        public const string ZScreenSizeName = "ZSCREEN_SIZE";
+        public const string ZTouchScreenName = "ZTOUCH_SCREEN";
 
         private const string rootXmlElementName = "OEMOptionalInfo";
         private const string nameXmlElementName = "Name";
         private const string valueXmlElementName = "Value";
         private const string fieldXmlElementName = "Field";
         private const string NumbericRegEx = "^[0-9]+$";
-      
+        private const string NonTounchRegEx = @"^Non[\s-]?Touch$";
+        private static Regex NonTounchReg = new Regex(NonTounchRegEx, RegexOptions.IgnoreCase);
+        private bool skipCheckIfLoadedFromDb;
 
         private XElement xml
         {
@@ -68,11 +71,11 @@ namespace DIS.Data.DataContract
         {
             get
             {
-                return Values[zPcModelSkuName];
+                return Values[ZPcModelSkuName];
             }
             set
             {
-                SetField(zPcModelSkuName, value);
+                SetField(ZPcModelSkuName, value);
             }
         }
 
@@ -80,11 +83,11 @@ namespace DIS.Data.DataContract
         {
             get
             {
-                return Values[zOemExtIdName];
+                return Values[ZOemExtIdName];
             }
             set
             {
-                SetField(zOemExtIdName, value);
+                SetField(ZOemExtIdName, value);
             }
         }
 
@@ -92,11 +95,11 @@ namespace DIS.Data.DataContract
         {
             get
             {
-                return Values[zManufGeoLocName];
+                return Values[ZManufGeoLocName];
             }
             set
             {
-                SetField(zManufGeoLocName, value);
+                SetField(ZManufGeoLocName, value);
             }
         }
 
@@ -104,11 +107,11 @@ namespace DIS.Data.DataContract
         {
             get
             {
-                return Values[zPgmEligValuesName];
+                return Values[ZPgmEligValuesName];
             }
             set
             {
-                SetField(zPgmEligValuesName, value);
+                SetField(ZPgmEligValuesName, value);
             }
         }
 
@@ -116,37 +119,37 @@ namespace DIS.Data.DataContract
         {
             get
             {
-                return Values[zChannelRelIdName];
+                return Values[ZChannelRelIdName];
             }
             set
             {
-                SetField(zChannelRelIdName, value);
+                SetField(ZChannelRelIdName, value);
             }
         }
 
         //add for V1.6
         public string ZFRM_FACTOR_CL1
         {
-            get { return Values[zFrmFactorCl1]; }
-            set { SetField(zFrmFactorCl1, value); }
+            get { return Values[ZFrmFactorCl1Name]; }
+            set { SetField(ZFrmFactorCl1Name, value); }
         }
 
         public string ZFRM_FACTOR_CL2
         {
-            get { return Values[zFrmFactorCl2]; }
-            set { SetField(zFrmFactorCl2, value); }
+            get { return Values[ZFrmFactorCl2Name]; }
+            set { SetField(ZFrmFactorCl2Name, value); }
         }
 
         public string ZSCREEN_SIZE
         {
-            get { return Values[zScreenSize]; }
-            set { SetField(zScreenSize, value); }
+            get { return Values[ZScreenSizeName]; }
+            set { SetField(ZScreenSizeName, value); }
         }
 
         public string ZTOUCH_SCREEN
         {
-            get { return Values[zTouchScreen]; }
-            set { SetField(zTouchScreen, value); }
+            get { return Values[ZTouchScreenName]; }
+            set { SetField(ZTouchScreenName, value); }
         }
 
         public bool HasOHRData
@@ -168,13 +171,18 @@ namespace DIS.Data.DataContract
             : this(null, null, null, null, null, null, null, null, null)
         {
             if (!string.IsNullOrEmpty(xml))
+            {
+                skipCheckIfLoadedFromDb = false; // import data from external.
                 this.xml = XElement.Parse(xml);
+            }
         }
 
         public OemOptionalInfo(string zPcModelSku, string zOemExtId,
           string zManufGeoLoc, string zPgmEligValues, string zChannelRelId, string zFrmFactor1,
           string zFrmFactor2, string screenSize, string touchScreen)
         {
+            skipCheckIfLoadedFromDb = true;
+
             Values = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
             ZPC_MODEL_SKU = zPcModelSku;
             ZOEM_EXT_ID = zOemExtId;
@@ -212,45 +220,97 @@ namespace DIS.Data.DataContract
         {
             List<Field> fields = new List<Field>();
             if (!string.IsNullOrEmpty(ZPC_MODEL_SKU))
-                fields.Add(new Field() { Name = zPcModelSkuName, Value = ZPC_MODEL_SKU });
+                fields.Add(new Field() { Name = ZPcModelSkuName, Value = ZPC_MODEL_SKU });
             if (!string.IsNullOrEmpty(ZMANUF_GEO_LOC))
-                fields.Add(new Field() { Name = zManufGeoLocName, Value = ZMANUF_GEO_LOC });
+                fields.Add(new Field() { Name = ZManufGeoLocName, Value = ZMANUF_GEO_LOC });
             if (!string.IsNullOrEmpty(ZPGM_ELIG_VALUES))
-                fields.Add(new Field() { Name = zPgmEligValuesName, Value = ZPGM_ELIG_VALUES });
+                fields.Add(new Field() { Name = ZPgmEligValuesName, Value = ZPGM_ELIG_VALUES });
             if (!string.IsNullOrEmpty(ZOEM_EXT_ID))
-                fields.Add(new Field() { Name = zOemExtIdName, Value = ZOEM_EXT_ID });
+                fields.Add(new Field() { Name = ZOemExtIdName, Value = ZOEM_EXT_ID });
             if (!string.IsNullOrEmpty(ZCHANNEL_REL_ID))
-                fields.Add(new Field() { Name = zChannelRelIdName, Value = ZCHANNEL_REL_ID });
+                fields.Add(new Field() { Name = ZChannelRelIdName, Value = ZCHANNEL_REL_ID });
 
             if (!string.IsNullOrEmpty(ZFRM_FACTOR_CL1))
-                fields.Add(new Field() { Name = zFrmFactorCl1, Value = ZFRM_FACTOR_CL1 });
+                fields.Add(new Field() { Name = ZFrmFactorCl1Name, Value = ZFRM_FACTOR_CL1 });
             if (!string.IsNullOrEmpty(ZFRM_FACTOR_CL2))
-                fields.Add(new Field() { Name = zFrmFactorCl2, Value = ZFRM_FACTOR_CL2 });
+                fields.Add(new Field() { Name = ZFrmFactorCl2Name, Value = ZFRM_FACTOR_CL2 });
             if (!string.IsNullOrEmpty(ZSCREEN_SIZE))
-                fields.Add(new Field() { Name = zScreenSize, Value = ZSCREEN_SIZE });
+                fields.Add(new Field() { Name = ZScreenSizeName, Value = ZSCREEN_SIZE });
             if (!string.IsNullOrEmpty(ZTOUCH_SCREEN))
-                fields.Add(new Field() { Name = zTouchScreen, Value = ZTOUCH_SCREEN });
+                fields.Add(new Field() { Name = ZTouchScreenName, Value = ZTOUCH_SCREEN });
             return fields;
         }
 
         public OemOptionalInfo(List<Field> fields)
             : this()
         {
+            skipCheckIfLoadedFromDb = false; // import data from external.
             foreach (Field field in fields)
             {
                 SetField(field.Name, field.Value);
             }
         }
 
+        public static TouchEnum ConvertTouchEnum(string value)
+        {
+            if (string.Compare(value.Trim(), TouchEnum.Touch.ToString(), ignoreCase: true) == 0)
+                return TouchEnum.Touch;
+            else if (NonTounchReg.IsMatch(value.Trim()))
+                return TouchEnum.Nontouch;
+            else
+                throw new ApplicationException(string.Format("{0} is not valid format.", ZTouchScreenName));
+        }
+
         private void SetField(string fieldName, string value)
         {
-            switch (fieldName.ToUpper())
+            if (!skipCheckIfLoadedFromDb) // import from external
             {
-                case zOemExtIdName:
-                    if (!string.IsNullOrEmpty(value) &&
-                        !System.Text.RegularExpressions.Regex.IsMatch(value, NumbericRegEx))
-                        throw new ApplicationException("OEM Extended Identifier value required numeric characters.");
-                    break;
+                switch (fieldName.ToUpper())
+                {
+                    case ZOemExtIdName:
+                        if (!string.IsNullOrEmpty(value) &&
+                            !System.Text.RegularExpressions.Regex.IsMatch(value, NumbericRegEx))
+                            throw new ApplicationException("OEM Extended Identifier value required numeric characters.");
+                        break;
+                    case ZFrmFactorCl1Name:
+                        if (!string.IsNullOrEmpty(value))
+                        {
+                            FormFactorL1Enum outzFrmFactorCl1;
+                            bool isValidFrmFactorCl1 = Enum.TryParse<FormFactorL1Enum>(value, true, out outzFrmFactorCl1);
+                            if (!isValidFrmFactorCl1)
+                                throw new ApplicationException(string.Format("{0} is not valid format.", ZFrmFactorCl1Name));
+
+                            value = outzFrmFactorCl1.ToString();
+                        }
+                        break;
+                    case ZFrmFactorCl2Name:
+                        if (!string.IsNullOrEmpty(value))
+                        {
+                            FormFactorL2Enum outzFrmFactorCl2;
+                            bool isValidFrmFactorCl2 = Enum.TryParse<FormFactorL2Enum>(value, true, out outzFrmFactorCl2);
+                            if (!isValidFrmFactorCl2)
+                                throw new ApplicationException(string.Format("{0} is not valid format.", ZFrmFactorCl2Name));
+
+                            value = outzFrmFactorCl2.ToString();
+                        }
+                        break;
+                    case ZTouchScreenName:
+                        if (!string.IsNullOrEmpty(value))
+                        {
+                            TouchEnum outTouchEnum = ConvertTouchEnum(value);
+                            value = outTouchEnum.ToString();
+                        }
+                        break;
+                    case ZScreenSizeName:
+                        if (!string.IsNullOrEmpty(value))
+                        {
+                            Decimal zScreenSizeOut;
+                            bool isValidDecimal = Decimal.TryParse(value, out zScreenSizeOut);
+                            if (!isValidDecimal)
+                                throw new ApplicationException(string.Format("{0} is not valid decimal format.", ZScreenSizeName));
+                        }
+                        break;
+                }
             }
 
             if (Values.ContainsKey(fieldName))
@@ -263,24 +323,34 @@ namespace DIS.Data.DataContract
     //add for OHR data
     public static class OHRData
     {
-        private static Dictionary<string, List<string>> zfrm_factorValue;
-        public static Dictionary<string, List<string>> ZFRM_FACTORValue
+        private static Dictionary<FormFactorL1Enum, List<FormFactorL2Enum>> zfrm_factorValue;
+        private static List<TouchEnum> zTOUCH_SCREENValue;
+
+        static OHRData()
+        {
+            zfrm_factorValue = zfrm_factorValue = new Dictionary<FormFactorL1Enum, List<FormFactorL2Enum>>()
+                    {
+                        { FormFactorL1Enum.Desktop, new List<FormFactorL2Enum>{FormFactorL2Enum.Standard, FormFactorL2Enum.AIO}},
+                        { FormFactorL1Enum.Notebook, new List<FormFactorL2Enum>{FormFactorL2Enum.Standard, FormFactorL2Enum.Ultraslim, FormFactorL2Enum.Convertible}},
+                        { FormFactorL1Enum.Tablet, new List<FormFactorL2Enum>{FormFactorL2Enum.Standard}},
+                    };
+
+            zTOUCH_SCREENValue = new List<TouchEnum>() { TouchEnum.Touch, TouchEnum.Nontouch };
+        }
+
+        public static Dictionary<FormFactorL1Enum, List<FormFactorL2Enum>> ZFRM_FACTORValue
         {
             get
             {
-                zfrm_factorValue = new Dictionary<string, List<string>>();
-                zfrm_factorValue.Add("Desktop", new List<string> { "Standard", "AIO" });
-                zfrm_factorValue.Add("Notebook", new List<string> { "Standard", "Ultraslim", "Convertible" });
-                zfrm_factorValue.Add("Tablet", new List<string> { "Standard", "Detachable" });
                 return zfrm_factorValue;
             }
         }
 
-        public static List<string> ZTOUCH_SCREENValue
+        public static List<TouchEnum> ZTOUCH_SCREENValue
         {
             get 
             {
-                return new List<string>() { "Touch", "Non-touch" };
+                return zTOUCH_SCREENValue;
             }
         }
     }

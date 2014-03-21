@@ -51,6 +51,10 @@ namespace DIS.Business.Client
         /// </summary>
         void KeyProviderServiceReport();
 
+        bool TestDatabaseDiskFull();
+
+        void DatabaseDiskFullReport(bool isFull);
+
         #region Microsoft services
 
         /// <summary>
@@ -107,6 +111,12 @@ namespace DIS.Business.Client
         /// </summary>
         /// <returns></returns>
         ReturnReport RetrievReturnReportAck(ReturnReport returnReport);
+
+        Guid ReportOhr(Ohr ohr);
+
+        Guid[] RetrieveOhrAcks();
+
+        Ohr RetrieveOhrAck(Ohr ohr);
 
         #endregion
 

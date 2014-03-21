@@ -218,6 +218,16 @@ namespace DIS.Business.Client
             Request(null, helper.KPSReport, HttpMethod.GET);
         }
 
+        public bool TestDatabaseDiskFull()
+        {
+            return Request<bool>(null, helper.TestDDF, HttpMethod.GET);
+        }
+
+        public void DatabaseDiskFullReport(bool isFull)
+        {
+            Request(isFull, helper.DDFReport, HttpMethod.POST);
+        }
+
         #region Key Transfer
 
         /// <summary>
@@ -464,6 +474,35 @@ namespace DIS.Business.Client
         public long[] SendKeySyncNotifications(List<KeySyncNotification> syncs)
         {
             return Request<long[]>(syncs.ToArray(), helper.SyncUrl, HttpMethod.POST);
+        }
+
+        public Guid ReportOhr(Ohr ohr)
+        {
+            if ((callDirection & CallDirection.Internal) != 0)
+                return Request<Guid>(ohr, helper.ReportOhrUrl, HttpMethod.POST);
+            else
+                return Request<DataUpdateResponse>(ohr.ToDataUpdateRequest(), helper.ReportOhrUrl, HttpMethod.POST).MSUpdateUniqueID;
+        }
+
+        public Guid[] RetrieveOhrAcks()
+        {
+            if ((callDirection & CallDirection.Internal) != 0)
+                return Request<Guid[]>(null, helper.OhrAckUrl, HttpMethod.GET);
+            else
+                return Request<string[]>(null, helper.OhrAckUrl, HttpMethod.GET).Select(i => Guid.Parse(i)).ToArray();
+        }
+
+        public Ohr RetrieveOhrAck(Ohr ohr)
+        {
+            if ((callDirection & CallDirection.Internal) != 0)
+            {
+                return Request<Ohr>(ohr, helper.OhrAckUrl, HttpMethod.POST);
+            }
+            else
+            {
+                var response = Request<DataUpdateAck>(ohr.MsUpdateUniqueId.Value, helper.OhrAckUrl, HttpMethod.GET);
+                return response.FromServiceContract();
+            }
         }
 
         #endregion

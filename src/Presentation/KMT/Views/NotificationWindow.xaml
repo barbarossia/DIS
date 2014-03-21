@@ -30,7 +30,7 @@
 
                             <TextBlock x:Uid="tbkMessage" Text="{Binding Message}" Margin="8" FontWeight="Bold" Grid.Row="0" Grid.ColumnSpan="3" TextWrapping="Wrap"></TextBlock>
                             <TextBlock x:Uid="tbkTimestamp" Text="{Binding Timestamp}" Margin="16,0,0,0" Grid.Row="2" Grid.Column="0"></TextBlock>
-                            <Button x:Uid="btnView" Command="{Binding ViewCommand}" Visibility="{Binding ViewButtonVisibility}" Content="{x:Static res:MergedResources.Common_View}" Style="{DynamicResource BtnViewSty}" Grid.Row="1" Grid.RowSpan="2" Grid.Column="1"></Button>
+                            <Button x:Uid="btnView" Command="{Binding ButtonCommand}" Visibility="{Binding ButtonVisibility}" Content="{Binding ButtonContent}" Style="{DynamicResource BtnViewSty}" Grid.Row="1" Grid.RowSpan="2" Grid.Column="1"></Button>
                         </Grid>
                     </DataTemplate>
                 </ListBox.ItemTemplate>

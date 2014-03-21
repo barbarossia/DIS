@@ -259,6 +259,65 @@ namespace DIS.Business.Library
             return results;
         }
 
+        public List<KeyInfo> UpdateKeysAfterRetrieveOhrAck(Ohr ohr, KeyStoreContext context = null)
+        {
+            var keys = ohr.Keys;
+            List<KeyInfo> keysInDb = GetKeysInDb(keys.Select(k => k.KeyId).ToArray());
+            if (keysInDb == null || keysInDb.Count == 0)
+                throw new ApplicationException("Update keys after retrieve ohr ack are not found.");
+
+            foreach (KeyInfo key in keysInDb)
+            {
+                try
+                {
+                    key.UlsReceivingOhrAck();
+                }
+                catch (Exception ex)
+                {
+                    ExceptionHandler.HandleException(ex);
+                }
+            }
+
+            if (keysInDb.Count > 0)
+            {
+                foreach (var key in keysInDb)
+                {
+                    UpdateKeysOhrDataAfterRetrieveOhrAck(key, ohr);
+                }
+                keyRepository.UpdateKeys(keysInDb);
+            }
+
+            return keysInDb;
+
+        }
+
+        private void UpdateKeysOhrDataAfterRetrieveOhrAck(KeyInfo key, Ohr ohr)
+        {
+            if (ohr.OhrKeys.Any(o => 
+                o.KeyId == key.KeyId && 
+                o.Name == OhrName.ProductKeyID &&
+                !string.IsNullOrEmpty(o.ReasonCode) && o.ReasonCode != Constants.CBRAckReasonCode.ActivationEnabled))
+                return;
+
+            var toUpdateKeys = ohr.OhrKeys.Where(o =>
+                (o.KeyId == key.KeyId) &&
+                (
+                o.Name == OemOptionalInfo.ZFrmFactorCl1Name ||
+                o.Name == OemOptionalInfo.ZFrmFactorCl2Name ||
+                o.Name == OemOptionalInfo.ZTouchScreenName ||
+                o.Name == OemOptionalInfo.ZScreenSizeName ||
+                o.Name == OemOptionalInfo.ZPcModelSkuName) && 
+                (string.IsNullOrEmpty(o.ReasonCode) || o.ReasonCode == Constants.CBRAckReasonCode.ActivationEnabled)).ToList();
+            
+            if (toUpdateKeys.Any())
+            {
+                foreach (var o in toUpdateKeys)
+                {
+                    key.UpdateOhrData(o.Name, o.Value);
+                }
+            }
+        }
+
         #endregion
 
         #region OaTool

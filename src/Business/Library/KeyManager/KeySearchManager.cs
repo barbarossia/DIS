@@ -55,6 +55,12 @@ namespace DIS.Business.Library
                 GetBoundKeyToMsSearchCriteria(searchCriteria));
         }
 
+        public List<KeyInfo> SearchOhrKeysToMs(KeySearchCriteria searchCriteria)
+        {
+            return keyRepository.SearchKeys(
+                GetOhrKeyToMsSearchCriteria(searchCriteria));
+        }
+
         public List<KeyInfo> SearchBoundKeysToMs(List<KeyGroup> keyGroups)
         {
             return keyRepository.SearchKeys(keyGroups);
@@ -93,6 +99,26 @@ namespace DIS.Business.Library
             myCriteria.KeyState = KeyState.Bound;
             myCriteria.HqId = CurrentHeadQuarterId;
             myCriteria.IsInProgress = false;
+
+            return new KeySearchCriteria[] { myCriteria };
+        }
+
+
+        private KeySearchCriteria[] GetOhrKeyToMsSearchCriteria(KeySearchCriteria searchCriteria)
+        {
+            var myCriteria = ConvertSearchCriteria(searchCriteria);
+            myCriteria.KeyType = KeyType.Standard;
+            myCriteria.KeyState = KeyState.ActivationEnabled;
+            myCriteria.HqId = CurrentHeadQuarterId;
+            myCriteria.IsInProgress = false;
+            //if (searchCriteria.KeyStateIds == null || searchCriteria.KeyStateIds.Count <= 0)
+            //{
+            //    myCriteria.KeyStates = new List<KeyState> { KeyState.ActivationEnabled };
+            //}
+            //else
+            //{
+            //    myCriteria.KeyStates = searchCriteria.KeyStateIds.Select(s => (KeyState)s).ToList();
+            //}
 
             return new KeySearchCriteria[] { myCriteria };
         }

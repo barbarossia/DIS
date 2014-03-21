@@ -96,7 +96,8 @@ namespace DIS.Data.DataAccess.Repository
                     break;
                 case FulfillmentStatus.InProgress:
                     if (statusToUpdate == FulfillmentStatus.Fulfilled
-                        || statusToUpdate == FulfillmentStatus.Failed)
+                        || statusToUpdate == FulfillmentStatus.Failed
+                        || statusToUpdate == FulfillmentStatus.Ready)
                         return true;
                     break;
             }

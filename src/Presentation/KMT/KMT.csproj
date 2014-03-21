@@ -160,6 +160,19 @@
     <Compile Include="Behaviors\OperationResultConverter.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Behaviors\TouchScreenEnumConverter.cs" />
+    <Compile Include="Controls\OhrKeyDetailsControl.xaml.cs">
+      <DependentUpon>OhrKeyDetailsControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\OhrKeyOperationResultsControl.xaml.cs">
+      <DependentUpon>OhrKeyOperationResultsControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\SearchOhrKeysControl.xaml.cs">
+      <DependentUpon>SearchOhrKeysControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\PagedKeysControl.xaml.cs">
+      <DependentUpon>PagedKeysControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Controls\KeyOperationResultsControl.xaml.cs">
       <DependentUpon>KeyOperationResultsControl.xaml</DependentUpon>
     </Compile>
@@ -178,6 +191,7 @@
     <Compile Include="Models\KeyGroupModel.cs" />
     <Compile Include="Models\KeyInfoModel.cs" />
     <Compile Include="Models\ReturnKeyModel.cs" />
+    <Compile Include="Models\ZfrmFactorCl1PropertyChangedEventHandle.cs" />
     <Compile Include="Notification.cs" />
     <Compile Include="Behaviors\BizzySpin.cs" />
     <Compile Include="Behaviors\BoolToVisibilityConverter.cs" />
@@ -197,6 +211,11 @@
     <Compile Include="Language.cs" />
     <Compile Include="Message.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Properties\ResourcesOfRTMv1.8.Designer.cs">
+      <DependentUpon>ResourcesOfRTMv1.8.resx</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+    </Compile>
     <Compile Include="Properties\ResourcesOfRTMv1.6.es.Designer.cs">
       <DependentUpon>ResourcesOfRTMv1.6.es.resx</DependentUpon>
       <AutoGen>True</AutoGen>
@@ -261,9 +280,13 @@
     <Compile Include="ViewModel\Configuration\SubsidiaryEditorViewModel.cs" />
     <Compile Include="ViewModel\Configuration\SystemSettingViewModel.cs" />
     <Compile Include="ViewModel\Configuration\UpLevelSystemViewModel.cs" />
+    <Compile Include="ViewModel\ControlsViewModel\SearchOhrKeysControlViewModel.cs" />
     <Compile Include="ViewModel\ControlsViewModel\ReturnKeysListViewModel.cs" />
     <Compile Include="ViewModel\ControlsViewModel\SearchControlViewModel.cs" />
+    <Compile Include="ViewModel\Key\OhrDataUpdateViewModel.cs" />
     <Compile Include="ViewModel\Key\ReturnKeysViewModel.cs" />
+    <Compile Include="ViewModel\Notification\OhrKeyInfo.cs" />
+    <Compile Include="ViewModel\Notification\OhrKeysNotificationViewModel.cs" />
     <Compile Include="ViewModel\Notification\ExportDuplicateCBRNotificationViewModel.cs" />
     <Compile Include="ViewModel\Notification\KeysExpiredNotificationViewModel.cs" />
     <Compile Include="ViewModel\Notification\KeysStockNotificationViewModel.cs" />
@@ -356,6 +379,13 @@
     <Compile Include="Views\Key\ImportKeysView\TypeSelectPage.xaml.cs">
       <DependentUpon>TypeSelectPage.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\Key\OhrDataUpdateView\OhrKeysSummary.xaml.cs">
+      <DependentUpon>OhrKeysSummary.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Key\OhrDataUpdateView\OhrDataUpdateWizard.cs" />
+    <Compile Include="Views\Key\OhrDataUpdateView\OhrKeysEdit.xaml.cs">
+      <DependentUpon>OhrKeysEdit.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\Key\RecallKeysView\RecallKeysWizard.cs" />
     <Compile Include="Views\Key\ReportKeysView\ReportKeysSummary.xaml.cs">
       <DependentUpon>ReportKeysSummary.xaml</DependentUpon>
@@ -393,6 +423,9 @@
     <Compile Include="Views\Key\UnAssignView\UnAssignkeysSelection.xaml.cs">
       <DependentUpon>UnAssignkeysSelection.xaml</DependentUpon>
       <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Views\Notification\OhrKeysNotificationView.xaml.cs">
+      <DependentUpon>OhrKeysNotificationView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\Notification\ExportDuplicateCBRNotificationView.xaml.cs">
       <DependentUpon>ExportDuplicateCBRNotificationView.xaml</DependentUpon>
@@ -477,6 +510,22 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Assets\WhistlerBlue.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Controls\OhrKeyDetailsControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Controls\OhrKeyOperationResultsControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Controls\SearchOhrKeysControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Controls\PagedKeysControl.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -580,6 +629,14 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Views\Key\OhrDataUpdateView\OhrKeysSummary.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\Key\OhrDataUpdateView\OhrKeysEdit.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="Views\Key\ReportKeysView\ReportKeysSummary.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -623,6 +680,10 @@
     <Page Include="Views\NotificationWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Notification\OhrKeysNotificationView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="Views\Notification\ExportDuplicateCBRNotificationView.xaml">
       <SubType>Designer</SubType>
@@ -737,6 +798,11 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Properties\ResourcesOfRTMv1.8.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>ResourcesOfRTMv1.8.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
     <EmbeddedResource Include="Properties\ResourcesOfRTMv1.6.es.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>ResourcesOfRTMv1.6.es.Designer.cs</LastGenOutput>

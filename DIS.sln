@@ -125,6 +125,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Resources", "Resources", "{
 		Deployment\Resources\MsiTran.Exe = Deployment\Resources\MsiTran.Exe
 		Deployment\Resources\msvcr100.dll = Deployment\Resources\msvcr100.dll
 		Deployment\Resources\mt.exe = Deployment\Resources\mt.exe
+		Deployment\Resources\RTM_1_8.sql = Deployment\Resources\RTM_1_8.sql
 		Deployment\Resources\setup.exe = Deployment\Resources\setup.exe
 		Deployment\Resources\setupbld.exe = Deployment\Resources\setupbld.exe
 		Deployment\Resources\SetupBuilder.dll = Deployment\Resources\SetupBuilder.dll

@@ -60,6 +60,8 @@ namespace DIS.Business.Library
 
         List<KeyOperationResult> UpdateKeysAfterRetrieveCbrAck(Cbr cbr, bool isDuplicated = false, KeyStoreContext context = null);
 
+        List<KeyInfo> UpdateKeysAfterRetrieveOhrAck(Ohr ohr, KeyStoreContext context = null);
+
         // Explaination needed here ...
         void UpdateKeysToCarbonCopy(List<KeyInfo> keys, bool shouldCarbonCopy, KeyStoreContext context = null);
 

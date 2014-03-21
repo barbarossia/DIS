@@ -175,7 +175,9 @@ namespace DIS.Business.Library
                 var update = (from db in dbReturnReport.ReturnReportKeys
                               join ack in returnReport.ReturnReportKeys on db.KeyId equals ack.KeyId
                               select updateReturnReportAck(db, ack)).ToList();
-                if (dbReturnReport.ReturnReportKeys.All(k => k.ReturnReasonCodeDescription.Contains("Accepted")))
+                if (dbReturnReport.ReturnReportKeys.All(k => k.ReturnReasonCode.StartsWith("Q")))
+                    dbReturnReport.ReturnNoCredit = true;
+                else if (dbReturnReport.ReturnReportKeys.All(k => k.ReturnReasonCode.StartsWith("O")))
                     dbReturnReport.ReturnNoCredit = false;
             }
             returnKeyRepository.UpdateReturnKeyAck(dbReturnReport, context);

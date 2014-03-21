@@ -73,8 +73,16 @@ namespace DIS.Presentation.KMT.ViewModel
             if (ReturnKeysListModelVM == null)
                 ReturnKeysListModelVM = new ReturnKeysListViewModel();
 
+            InitKeyTypes();
             InitKeystates();
             this.InitView();
+        }
+
+        private void InitKeyTypes()
+        {
+            List<string> keyTypes = new List<string>(){KeyType.Standard.ToString(), KeyType.MBR.ToString(), KeyType.MAT.ToString()};
+            base.SearchControlVM.KeyTypes = new ObservableCollection<string>(keyTypes);
+            base.SearchControlVM.SelectedKeyType = base.SearchControlVM.KeyTypes.First();
         }
 
         private void InitKeystates()
@@ -112,8 +120,7 @@ namespace DIS.Presentation.KMT.ViewModel
         {
             if (ReturnKeysListModelVM.ValidateOemRmaNumberTxt() && ReturnKeysListModelVM.ValidateReturnNoCredit() && base.CurrentPageIndex == 0 && base.StepPages[CurrentPageIndex].IsLoaded)
             {                
-                base.TabIndex = KmtConstants.SecondTab;
-                base.SearchControlVM.SelectedKeyType = base.SearchControlVM.KeyTypes.First();
+                base.TabIndex = KmtConstants.SecondTab;               
                 base.GoToNextPage();
             }
         }

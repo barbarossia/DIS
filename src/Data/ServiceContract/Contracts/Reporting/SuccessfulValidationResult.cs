@@ -25,5 +25,8 @@ namespace DIS.Data.ServiceContract
 
         [DataMember(Order = 3)]
         public OEMOptionalInfoError[] OEMOptionalInfoErrors { get; set; }
+
+        [DataMember(Order = 4, EmitDefaultValue = false)]
+        public OEMHardwareReportError[] OEMHardwareReportErrors { get; set; }
     }
 }

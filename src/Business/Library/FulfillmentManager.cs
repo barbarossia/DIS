@@ -103,6 +103,19 @@ namespace DIS.Business.Library {
             fulfillRepository.UpdateFulfillment(info, context);
         }
 
+        public void UpdateFulfillmentFailedWhenDiskIsFull()
+        {
+            List<FulfillmentInfo> readyInfoes = fulfillRepository.GetFulfillments(FulfillmentStatus.InProgress);
+            if (readyInfoes.Count > 0)
+            {
+                foreach (var info in readyInfoes)
+                {
+                    info.FulfillmentStatus = FulfillmentStatus.Failed;
+                    fulfillRepository.UpdateFulfillment(info);
+                }
+            }
+        }
+
         private void UpdateFullfillmentToInProgess(FulfillmentInfo info)
         {
             info.FulfillmentStatus = FulfillmentStatus.InProgress;

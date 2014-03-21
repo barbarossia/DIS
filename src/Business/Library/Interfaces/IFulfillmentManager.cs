@@ -25,5 +25,7 @@ namespace DIS.Business.Library {
         void SaveAvailableFulfillments(List<FulfillmentInfo> infoes);
         void RetrieveFulfilment(List<FulfillmentInfo> infoes, Func<FulfillmentInfo, List<KeyInfo>> getKeys);
         void UpdateFulfillmentToCompleted(FulfillmentInfo info, KeyStoreContext context);
+        void UpdateFulfillmentFailedWhenDiskIsFull();
     }
+
 }

@@ -15,6 +15,7 @@ using System.Windows;
 using System.Windows.Input;
 using DIS.Presentation.KMT.Commands;
 using DIS.Presentation.KMT.ViewModel;
+using DIS.Presentation.KMT.Properties;
 
 namespace DIS.Presentation.KMT
 {
@@ -23,15 +24,16 @@ namespace DIS.Presentation.KMT
     /// </summary>
     public class Notification
     {
+        public string ButtonContent { get; set; }
         /// <summary>
         /// 
         /// </summary>
-        public ICommand ViewCommand { get; private set; }
+        public ICommand ButtonCommand { get; private set; }
         
         /// <summary>
         /// 
         /// </summary>
-        public Visibility ViewButtonVisibility { get; set; }
+        public Visibility ButtonVisibility { get; set; }
 
         /// <summary>
         /// 
@@ -50,28 +52,34 @@ namespace DIS.Presentation.KMT
             Callback = callback;
 
             Timestamp = DateTime.Now;
-            if (WindowType == null)
-                ViewButtonVisibility = Visibility.Hidden;
+            if (WindowType == null && Callback == null)
+                ButtonVisibility = Visibility.Hidden;
+            ButtonContent = WindowType == null ? MergedResources.Common_Ok : MergedResources.Common_View;
         }
 
         /// <summary>
         /// 
         /// </summary>
         public void SetViewCommand() {
-            ViewCommand = new DelegateCommand(() => {
-                Window window = null;
-                WindowCollection windows = App.Current.Windows;
-                for (int i = 0; i < windows.Count; i++) {
-                    if (windows[i].GetType() == WindowType) {
-                        window = windows[i];
-                        break;
+            ButtonCommand = new DelegateCommand(() => {
+                if (WindowType != null)
+                {
+                    Window window = null;
+                    WindowCollection windows = App.Current.Windows;
+                    for (int i = 0; i < windows.Count; i++)
+                    {
+                        if (windows[i].GetType() == WindowType)
+                        {
+                            window = windows[i];
+                            break;
+                        }
                     }
-                }
-                if (window != null)
-                    window.Close();
+                    if (window != null)
+                        window.Close();
 
-                window = (Window)Activator.CreateInstance(WindowType, WindowParameters);
-                window.ShowDialog();
+                    window = (Window)Activator.CreateInstance(WindowType, WindowParameters);
+                    window.ShowDialog();
+                }
                 if (Callback != null)
                     Callback();
             });
@@ -164,5 +172,9 @@ namespace DIS.Presentation.KMT
         ReturnedKeysFaild,
 
         OhrDataMissed,
+
+        ConfirmedOhrs,
+
+        SystemError_DabaseDiskFull,
     }
 }

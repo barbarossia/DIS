@@ -17,7 +17,7 @@
         </Grid.RowDefinitions>
         <Rectangle Style="{DynamicResource RectRootSty}"></Rectangle>
         <Image  x:Uid="imgBackground" Stretch="Fill" VerticalAlignment="Center" HorizontalAlignment="Center" Source="/DIS.Presentation.KMT;component/icons/about.png" Margin="0" Height="176" Width="405"  />
-        <TextBlock x:Uid="tbkVersion"   Grid.Row="1" Text="Version    RTM V1.6    (2013)" Grid.RowSpan="2" FontSize="14" Style="{DynamicResource AboutTbkSty}"/>
+        <TextBlock x:Uid="tbkVersion"   Grid.Row="1" Text="Version    RTM V1.8    (2014)" Grid.RowSpan="2" FontSize="14" Style="{DynamicResource AboutTbkSty}"/>
         <TextBlock x:Uid="tbkDescPara1" Grid.Row="2"  Text="This software solution has been developed" Grid.RowSpan="2" Style="{DynamicResource AboutTbkSty}"/>
         <TextBlock x:Uid="tbkDescPara2" Grid.Row="3"  Text="by Chinasoft International Inc. for Microsoft Corporation."  Grid.RowSpan="2" Style="{DynamicResource AboutTbkSty}"/>
     </Grid>

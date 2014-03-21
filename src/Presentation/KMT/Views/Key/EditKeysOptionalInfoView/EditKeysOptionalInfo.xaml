@@ -69,7 +69,7 @@
                 <DataGridTextColumn  Header="ZFRM_FACTOR_CL1"  Binding="{Binding keyInfo.ZFRM_FACTOR_CL1}" SortMemberPath="ZFRM_FACTOR_CL1" IsReadOnly="True" MinWidth="75"></DataGridTextColumn>
                 <DataGridTextColumn  Header="ZFRM_FACTOR_CL2"  Binding="{Binding keyInfo.ZFRM_FACTOR_CL2}" SortMemberPath="ZFRM_FACTOR_CL2" IsReadOnly="True" MinWidth="75"></DataGridTextColumn>
                 <DataGridTextColumn  Header="ZSCREEN_SIZE"  Binding="{Binding keyInfo.ZSCREEN_SIZE}" SortMemberPath="ZSCREEN_SIZE" IsReadOnly="True" MinWidth="75"></DataGridTextColumn>
-                <DataGridTextColumn  Header="ZTOUCH_SCREEN"  Binding="{Binding keyInfo.ZTOUCH_SCREEN}" SortMemberPath="ZTOUCH_SCREEN" IsReadOnly="True" MinWidth="75"></DataGridTextColumn>
+                <DataGridTextColumn  Header="ZTOUCH_SCREEN"  Binding="{Binding keyInfo.ZTOUCH_SCREEN,Converter={StaticResource touchScreenEnumConverter}}" SortMemberPath="ZTOUCH_SCREEN" IsReadOnly="True" MinWidth="75"></DataGridTextColumn>
             </DataGrid.Columns>
         </DataGrid>
         <Grid Grid.Row="2" Margin="10" Width="auto" HorizontalAlignment="Left" VerticalAlignment="Bottom">
@@ -104,9 +104,9 @@
             <TextBox x:Uid="txtChanRelId"  input:InputMethod.IsInputMethodEnabled="False" IsEnabled="{Binding CanEdit}"    MaxLength="32" Behaviors:TextBoxFilters.IsAlphaNumericFilter="True"  Grid.Row="3" Grid.Column="1" Text="{Binding ZCHANNEL_REL_ID}" Style="{StaticResource TxtNormalSty}" />
             <ComboBox  x:Uid="cbFactor1"  x:Name="drpFactor1" Grid.Row="3" Grid.Column="3"  IsEnabled="{Binding CanEdit}" ItemsSource="{Binding ZFRM_FACTOR_CL1s}" SelectedItem="{Binding SelectedZFRM_FACTOR_CL1, Mode=TwoWay}" Style="{StaticResource CboNormalSty}" MinWidth="180"/>
             <ComboBox  x:Uid="cbFactor2"  x:Name="drpFactor2" Grid.Row="4" Grid.Column="1"  IsEnabled="{Binding CanEdit}" ItemsSource="{Binding ZFRM_FACTOR_CL2s}" SelectedItem="{Binding SelectedZFRM_FACTOR_CL2, Mode=TwoWay}" Style="{StaticResource CboNormalSty}" MinWidth="180"/>
-            
-            <TextBox x:Uid="txtScreenSize"     IsEnabled="{Binding CanEdit}"    MaxLength="32" Grid.Row="4" Grid.Column="3"   Text="{Binding ZSCREEN_SIZE}" Style="{StaticResource TxtNormalSty}"/>
-            <ComboBox  x:Uid="cbTouchScreen"  x:Name="drpTouchScreen" Grid.Row="5" Grid.Column="1"  IsEnabled="{Binding CanEdit}" ItemsSource="{Binding ZTOUCH_SCREENs}" SelectedItem="{Binding SelectedZTOUCH_SCREEN, Mode=TwoWay}" Style="{StaticResource CboNormalSty}"  MinWidth="180"/>
+
+            <TextBox x:Uid="txtScreenSize"     IsEnabled="{Binding CanEdit}"    MaxLength="32" Grid.Row="4" Grid.Column="3"   Text="{Binding ZSCREEN_SIZE}" Style="{StaticResource TxtNormalSty}" Behaviors:TextBoxFilters.IsDecimalFilter="True"/>
+            <ComboBox  x:Uid="cbTouchScreen"  x:Name="drpTouchScreen" Grid.Row="5" Grid.Column="1"  IsEnabled="{Binding CanEdit}" ItemsSource="{Binding ZTOUCH_SCREENs}" SelectedItem="{Binding SelectedZTOUCH_SCREEN, Mode=TwoWay, Converter={StaticResource touchScreenEnumConverter}}" Style="{StaticResource CboNormalSty}"  MinWidth="180"/>
             <Button  x:Uid="btnClear" IsEnabled="{Binding CanEdit}" VerticalAlignment="Bottom" Grid.Column="3" Grid.Row="5"   HorizontalAlignment="Right" Content="{x:Static res:MergedResources.Common_Clear}" Command="{Binding ClearCommand}" Style="{StaticResource BtnNormalSty}"></Button>
         </Grid>
         <StackPanel Grid.Row="3" Grid.ColumnSpan="4" VerticalAlignment="Bottom" Margin="0,20,20,20" Width="auto" HorizontalAlignment="Right" Orientation="Horizontal">

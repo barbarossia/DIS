@@ -27,6 +27,7 @@ using DIS.Presentation.KMT.Properties;
 using DIS.Presentation.KMT.Views.Key.DuplicateKeysView;
 using DIS.Presentation.KMT.Models;
 using System.Threading.Tasks;
+using DIS.Presentation.KMT.Behaviors;
 
 namespace DIS.Presentation.KMT.ViewModel
 {
@@ -59,7 +60,7 @@ namespace DIS.Presentation.KMT.ViewModel
         private string msPartNumber = string.Empty;
         private string oemPartNumber = string.Empty;
         private string oemPoNumber = string.Empty;
-        private string productKeyID = string.Empty;
+        //private string productKeyID = string.Empty;
         private string productKeyIDFrom = null;
         private string productKeyIDTo = null;
         private string productKey = string.Empty;
@@ -760,18 +761,18 @@ namespace DIS.Presentation.KMT.ViewModel
         /// <summary>
         /// Search Criteria:Product Key ID
         /// </summary>
-        public string ProductKeyID
-        {
-            get
-            {
-                return productKeyID;
-            }
-            set
-            {
-                productKeyID = value.Trim();
-                RaisePropertyChanged("ProductKeyID");
-            }
-        }
+        //public string ProductKeyID
+        //{
+        //    get
+        //    {
+        //        return productKeyID;
+        //    }
+        //    set
+        //    {
+        //        productKeyID = value.Trim();
+        //        RaisePropertyChanged("ProductKeyID");
+        //    }
+        //}
 
         public string ProductKeyIDFrom
         {
@@ -1186,7 +1187,7 @@ namespace DIS.Presentation.KMT.ViewModel
                         searchCriteria.MsOrderNumber = OrderNumber;
                         searchCriteria.MsPartNumber = MsPartNumber;
                         searchCriteria.OemPartNumber = OEMPartNumber;
-                        searchCriteria.ProductKeyID = ProductKeyID;
+                        //searchCriteria.ProductKeyID = ProductKeyID;
                         if (!string.IsNullOrEmpty(ProductKeyIDFrom))
                             searchCriteria.ProductKeyIDFrom = long.Parse(ProductKeyIDFrom);
                         if (!string.IsNullOrEmpty(ProductKeyIDTo))
@@ -1220,6 +1221,11 @@ namespace DIS.Presentation.KMT.ViewModel
                         if (SelectedSubSidiary != null && SelectedSubSidiary.SsId != 0)
                         {
                             searchCriteria.SsId = SelectedSubSidiary.SsId;
+                            if (SelectedSubSidiary.SsId == -1)
+                            {
+                                searchCriteria.SsId = null;
+                                searchCriteria.IsAssign = false;
+                            }
                         }
                         if (!string.IsNullOrEmpty(SelectedKeyType) && SelectedKeyType != MergedResources.Common_All)
                         {
@@ -1302,13 +1308,14 @@ namespace DIS.Presentation.KMT.ViewModel
                 KeysDetailsValueCollection.Add(ResourcesOfRTMv1_6.EditOptionalInfo_Factor1Name, keySelected.keyInfo.ZFRM_FACTOR_CL1);
                 KeysDetailsValueCollection.Add(ResourcesOfRTMv1_6.EditOptionalInfo_Factor2Name, keySelected.keyInfo.ZFRM_FACTOR_CL2);
                 KeysDetailsValueCollection.Add(ResourcesOfRTMv1_6.EditOptionalInfo_ScreenSizeName, keySelected.keyInfo.ZSCREEN_SIZE);
-                KeysDetailsValueCollection.Add(ResourcesOfRTMv1_6.EditOptionalInfo_TouchScreenName, keySelected.keyInfo.ZTOUCH_SCREEN);
+                KeysDetailsValueCollection.Add(ResourcesOfRTMv1_6.EditOptionalInfo_TouchScreenName, TouchScreenEnumHelper.Convert(keySelected.keyInfo.ZTOUCH_SCREEN));
 
                 KeysDetailsValueCollection.Add(MergedResources.Common_TrackingInfo, keySelected.keyInfo.TrackingInfo);
                 KeysDetailsValueCollection.Add(MergedResources.UserManagement_CreatedDate, keySelected.keyInfo.CreatedDate.ToString());
                 KeysDetailsValueCollection.Add(ResourcesOfR6.ReturnKeysView_OEMRMANumber, keySelected.keyInfo.ReturnReportKeys.Count > 0 ? keySelected.keyInfo.ReturnReportKeys.Last().ReturnReport.OemRmaNumber : "");
                 KeysDetailsValueCollection.Add(ResourcesOfR6.ReturnKeysView_OEMRMADate, keySelected.keyInfo.ReturnReportKeys.Count > 0 ? keySelected.keyInfo.ReturnReportKeys.Last().ReturnReport.OemRmaDate.ToString() : "");
                 var returnKeyResult = GetKeyInfoReturnReport(keySelected);
+                KeysDetailsValueCollection.Add(ResourcesOfRTMv1_6.ReturnTypeLabel, returnKeyResult.Item3);
                 KeysDetailsValueCollection.Add(ResourcesOfRTMv1_4.Common_ColumnWithoutCredit, returnKeyResult.Item1);
                 KeysDetailsValueCollection.Add(ResourcesOfRTMv1_4.Common_ColumnReturnReasonCode, returnKeyResult.Item2);
                 keysDetailsValueCollection.Add(ResourcesOfRTMv1_4.Common_ColumnTags, keySelected.keyInfo.Tags);
@@ -1316,7 +1323,7 @@ namespace DIS.Presentation.KMT.ViewModel
             }
         }
 
-        private Tuple<string, string> GetKeyInfoReturnReport(KeyInfoModel keySelected)
+        private Tuple<string, string, string> GetKeyInfoReturnReport(KeyInfoModel keySelected)
         {
             var lastReturnReport = keySelected.keyInfo.ReturnReportKeys
                 .Select(k => k.ReturnReport)
@@ -1325,10 +1332,14 @@ namespace DIS.Presentation.KMT.ViewModel
 
             if (lastReturnReport != null)
             {
-                return new Tuple<string, string>(lastReturnReport.ReturnNoCredit.ToString(), keySelected.keyInfo.ReturnReportKeys.Single(k => k.CustomerReturnUniqueId == lastReturnReport.CustomerReturnUniqueId).ReturnReasonCode);
+                var returnkey = keySelected.keyInfo.ReturnReportKeys.Single(k => k.CustomerReturnUniqueId == lastReturnReport.CustomerReturnUniqueId);
+                var withoutCredit = lastReturnReport.ReturnNoCredit.ToString();
+                if (!string.IsNullOrEmpty(returnkey.ReturnReasonCode))
+                    withoutCredit = (!returnkey.ReturnReasonCode.StartsWith("O")).ToString();
+                return new Tuple<string, string, string>(withoutCredit, returnkey.ReturnReasonCode, returnkey.ReturnTypeId);
             }
 
-            return new Tuple<string, string>(string.Empty, string.Empty);
+            return new Tuple<string, string, string>(string.Empty, string.Empty, string.Empty);
         }
 
         /// <summary>
@@ -1384,6 +1395,7 @@ namespace DIS.Presentation.KMT.ViewModel
             {
                 Subsidiarys = new ObservableCollection<Subsidiary>(ssProxy.GetSubsidiaries());
                 Subsidiarys.Insert(0, new Subsidiary() { SsId = 0, DisplayName = MergedResources.Common_All });
+                Subsidiarys.Insert(1, new Subsidiary() { SsId = -1, DisplayName = ResourcesOfRTMv1_6.NoAssignLabel });
                 //Select 'Show All' on First Load
                 SelectedSubSidiary = Subsidiarys.FirstOrDefault();
             }
@@ -1420,6 +1432,7 @@ namespace DIS.Presentation.KMT.ViewModel
                 standardKeyStates.Add(KeyState.ActivationDenied.ToString());
                 standardKeyStates.Add(KeyState.ReportedReturn.ToString());
                 standardKeyStates.Add(KeyState.Returned.ToString());
+                standardKeyStates.Add(KeyState.ActivationEnabledPendingUpdate.ToString());
 
                 MBRKeyStates.Add(KeyState.Fulfilled.ToString());
                 MBRKeyStates.Add(KeyState.Assigned.ToString());
@@ -1449,6 +1462,7 @@ namespace DIS.Presentation.KMT.ViewModel
                 {
                     standardKeyStates.Add(KeyState.ReportedBound.ToString());
                     standardKeyStates.Add(KeyState.ReportedReturn.ToString());
+                    standardKeyStates.Add(KeyState.ActivationEnabledPendingUpdate.ToString());
                 }
 
                 MBRKeyStates.Add(KeyState.Fulfilled.ToString());
@@ -1663,7 +1677,7 @@ namespace DIS.Presentation.KMT.ViewModel
         {
             List<string> lists = new List<string>();
             lists.Add("All");
-            OHRData.ZFRM_FACTORValue.Select(k => k.Key).ToList().ForEach(k => { lists.Add(k); });
+            OHRData.ZFRM_FACTORValue.Select(k => k.Key).ToList().ForEach(k => { lists.Add(k.ToString()); });
             this.zfrm_factor_cl1s = lists;
             this.selectedzfrm_factor_cl1 = lists.FirstOrDefault();
         }
@@ -1673,7 +1687,7 @@ namespace DIS.Presentation.KMT.ViewModel
             List<string> lists = new List<string>();
             lists.Add("All");
             if (!string.IsNullOrEmpty(factor1value) && factor1value != "All")
-                OHRData.ZFRM_FACTORValue.Where(k => k.Key == factor1value).FirstOrDefault().Value.ForEach(k => { lists.Add(k); });
+                OHRData.ZFRM_FACTORValue.Where(k => k.Key.ToString() == factor1value).FirstOrDefault().Value.ForEach(k => { lists.Add(k.ToString()); });
             this.zfrm_factor_cl2s = lists;
         }
 
@@ -1681,7 +1695,7 @@ namespace DIS.Presentation.KMT.ViewModel
         {
             List<string> lists = new List<string>();
             lists.Add("All");
-            OHRData.ZTOUCH_SCREENValue.ForEach(k => lists.Add(k));
+            OHRData.ZTOUCH_SCREENValue.ForEach(k => lists.Add(EnumHelper.GetFieldDecription(typeof(TouchEnum), k)));
             this.ztouch_screens = lists;
             this.selectedztouch_screen = lists.FirstOrDefault();
         }
@@ -1693,7 +1707,7 @@ namespace DIS.Presentation.KMT.ViewModel
             MsPartNumber = string.Empty;
             OEMPartNumber = string.Empty;
             OEMPoNumber = string.Empty;
-            ProductKeyID = string.Empty;
+            //ProductKeyID = string.Empty;
             ProductKeyIDFrom = string.Empty;
             ProductKeyIDTo = string.Empty;
             ProductKey = string.Empty;
@@ -1715,6 +1729,8 @@ namespace DIS.Presentation.KMT.ViewModel
             this.SelectedKeyType = KeyTypes.FirstOrDefault().ToString();
             this.SelectReturnState = ReturnStates.FirstOrDefault().ToString();
             this.OemRmaNumber = string.Empty;
+            this.StartOemRMADate = null;
+            this.EndOemRMADate = null;
         }
         #endregion
     }

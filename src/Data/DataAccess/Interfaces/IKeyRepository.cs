@@ -44,6 +44,6 @@ namespace DIS.Data.DataAccess.Repository
 
         void DeleteKeys(long[] keyIds);
 
-        void UpdateKeys(List<KeyInfo> keys);
+        void UpdateKeys(List<KeyInfo> keys, KeyStoreContext context = null);
     }
 }

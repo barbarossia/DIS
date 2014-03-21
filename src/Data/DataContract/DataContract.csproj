@@ -110,6 +110,8 @@
     <Compile Include="Entities\Log.cs" />
     <Compile Include="Entities\ReturnReport.cs" />
     <Compile Include="Entities\ReturnReportKey.cs" />
+    <Compile Include="FormFactorL1Enum.cs" />
+    <Compile Include="FormFactorL2Enum.cs" />
     <Compile Include="InstallType.cs" />
     <Compile Include="KeyType.cs" />
     <Compile Include="LogToView.cs" />
@@ -129,6 +131,10 @@
     <Compile Include="KeyOperationResult.cs" />
     <Compile Include="KeyState.cs" />
     <Compile Include="LogSearchCriteria.cs" />
+    <Compile Include="Entities\Ohr.cs" />
+    <Compile Include="Entities\OhrKey.cs" />
+    <Compile Include="OhrName.cs" />
+    <Compile Include="OhrStatus.cs" />
     <Compile Include="PasswordVersion.cs" />
     <Compile Include="ProxySetting.cs" />
     <Compile Include="ReturnKeySearchCriteria.cs" />
@@ -142,6 +148,8 @@
     <Compile Include="ServiceConfig.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="KeySearchCriteria.cs" />
+    <Compile Include="TouchEnum.cs" />
+    <Compile Include="TypeConversionExtension.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Common\Utility\Utility.csproj">
@@ -149,6 +157,7 @@
       <Name>Utility</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

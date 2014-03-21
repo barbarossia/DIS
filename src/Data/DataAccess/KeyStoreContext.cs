@@ -94,6 +94,8 @@ namespace DIS.Data.DataAccess
         public DbSet<ReturnReport> ReturnReports { get; set; }
         public DbSet<ReturnReportKey> ReturnReportKeys { get; set; }
         public DbSet<TempKeyId> TempKeyId { get; set; }
+        public DbSet<Ohr> Ohrs { get; set; }
+        public DbSet<OhrKey> OhrKeys { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
@@ -122,6 +124,8 @@ namespace DIS.Data.DataAccess
             modelBuilder.Configurations.Add(new ReturnReportMap());
             modelBuilder.Configurations.Add(new ReturnReportKeyMap());
             modelBuilder.Configurations.Add(new TempKeyIdMap());
+            modelBuilder.Configurations.Add(new OHRDataUpdateMap());
+            modelBuilder.Configurations.Add(new OHRDataUpdateKeyMap());
         }
     }
 }

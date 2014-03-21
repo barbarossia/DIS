@@ -27,6 +27,10 @@ namespace DIS.Business.Proxy
 
         List<FulfillmentInfo> GetFailedFulfillments(bool shouldIncludeExpired);
 
+        List<Ohr> GetConfirmedOhrs();
+
+        void UpdateOhrAfterNotification(List<Ohr> ohrs);
+
         #endregion
 
         #region Online keys
@@ -57,6 +61,8 @@ namespace DIS.Business.Proxy
         List<KeyOperationResult> SendBoundKeys(List<KeyGroup> groupKeys);
 
         void ReceiveSyncNotification(List<KeyInfo> keys);
+
+        List<KeyOperationResult> SendOhrKeys(List<KeyInfo> keys);
 
         #endregion
 

@@ -38,7 +38,6 @@
                 <Custom:RibbonGroup x:Uid="rbngOnline" Header="{x:Static res:MergedResources.MainWindow_Online}">
                     <Custom:RibbonButton x:Uid="rbnbGetKeys" IsEnabled="{Binding IsEnableGetKeys}" KeyTip="G" x:Name="btngetKeys" LargeImageSource="/DIS.Presentation.KMT;component/icons/get_keys.png"  Label="{x:Static res:MergedResources.MainWindow_GetKeys}"  Command="{Binding GetKeysCommand}" />
                     <Custom:RibbonButton x:Uid="rbnbReportKeys" KeyTip="P" x:Name="btnreportKeys" LargeImageSource="/DIS.Presentation.KMT;component/icons/sendcbr.png" Label="{x:Static res:MergedResources.MainWindow_ReportKeys}"  Command="{Binding ReportKeysCommand}" />
-
                 </Custom:RibbonGroup>
                 <!--Visibility="{Binding Path=IsManagerOfCKIOrFKI,Converter={StaticResource boolToVis}}-->
                 <Custom:RibbonGroup x:Uid="rbngAssignment" Header="{x:Static res:MergedResources.MainWindow_Assignment}" Visibility="{Binding Path=IsCKIOrFKI,Converter={StaticResource boolToVis}}">
@@ -51,8 +50,9 @@
                     <Custom:RibbonButton x:Uid="rbnbRevertKeys" KeyTip="MA" x:Name="btnrevertKeys" LargeImageSource="/DIS.Presentation.KMT;component/icons/markasallocated.png" Label="{x:Static res:MergedResources.Revert_RevertTxt}" Visibility="{Binding Path=IsManagerOfFFKI,Converter={StaticResource boolToVis}}" Command="{Binding MarkAllocatedCommand}"/>
                 </Custom:RibbonGroup>
                 <Custom:RibbonGroup x:Uid="rbngEditOptionalInfo" Header="{x:Static res:MergedResources.Common_Info}" 
-                                     IsEnabled="{Binding IsAutoReportDisabled}" Visibility="{Binding Path=IsManagerOfCKIOrFKI,Converter={StaticResource boolToVis}}">
-                    <Custom:RibbonButton x:Uid="rbnbEditOptionalInfo" x:Name="btnEditOptionalInfo" KeyTip="ME" Label="{x:Static res:MergedResources.EditOptionalInfo_Title}" LargeImageSource="/DIS.Presentation.KMT;component/icons/edit.png" Command="{Binding EditOptionalInfoCommand}"/>
+                                     Visibility="{Binding Path=IsManagerOfCKIOrFKI,Converter={StaticResource boolToVis}}">
+                    <Custom:RibbonButton x:Uid="rbnbEditOptionalInfo" x:Name="btnEditOptionalInfo" KeyTip="ME" Label="{x:Static res:MergedResources.EditOptionalInfo_Title}" LargeImageSource="/DIS.Presentation.KMT;component/icons/edit.png" Command="{Binding EditOptionalInfoCommand}" IsEnabled="{Binding IsAutoReportDisabled}"/>
+                    <Custom:RibbonButton x:Uid="rbnbOhrKeys" KeyTip="R" x:Name="btnohrKeys" LargeImageSource="/DIS.Presentation.KMT;component/icons/report.png" Label="{x:Static res:ResourcesOfRTMv1_8.MainWindow_OHR}"  Command="{Binding OhrCommand}" IsEnabled="{Binding IsUlsEnabledAndInDeCentralizeModeAndManager}"/>
                 </Custom:RibbonGroup>
                 <Custom:RibbonGroup x:Uid="rbngkeysPage" Header="{x:Static res:MergedResources.MainWindow_Page}">
                     <Custom:RibbonButton x:Uid="rbnbRefreshKeys" x:Name="btnrefreshkey" KeyTip="R" Label="{x:Static res:MergedResources.MainWindow_Fresh}" LargeImageSource="/DIS.Presentation.KMT;component/icons/refresh.png" Command="{Binding RefreshKeysCommand}"/>

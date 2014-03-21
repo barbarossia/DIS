@@ -48,6 +48,33 @@ namespace DIS.Business.Proxy
             return ReportKeys(keys);
         }
 
+        public List<KeyOperationResult> SendOhrKeys(List<KeyInfo> keys)
+        {
+            List<KeyInfo> keysIndb = base.GetKeysInDb(keys);
+            if (keysIndb.Any(k => k.KeyState != KeyState.ActivationEnabled))
+                throw new DisException("Do not report repeatedly, these keys had already been reported by backend service.");
+            
+            if (!configManager.GetIsMsServiceEnabled())
+                return keys.Select(k => new KeyOperationResult()
+                {
+                    Failed = true,
+                    FailedType = KeyErrorType.Invalid,
+                    Key = k
+                }).ToList();
+
+            using (KeyStoreContext context = KeyStoreContext.GetContext())
+            {
+                base.UpdateSyncState(keys, true, context);
+                ohrManager.GenerateOhr(keys, context);
+                context.SaveChanges();
+            }
+            return keys.Select(k => new KeyOperationResult()
+            {
+                Failed = false,
+                Key = k
+            }).ToList();
+        }
+
         public List<KeyOperationResult> SendBoundKeys(List<KeyGroup> groupKeys)
         {
             List<KeyInfo> keys = base.SearchBoundKeysToReport(groupKeys);
@@ -101,6 +128,25 @@ namespace DIS.Business.Proxy
             }
         }
 
+        private void SendGeneratedOhrs()
+        {
+            List<Ohr> Ohrs = ohrManager.GetOhrsNotBeenSent();
+            foreach (var ohr in Ohrs)
+            {
+                try
+                {
+                    ohr.MsUpdateUniqueId = msClient.ReportOhr(ohr);
+                    UpdateOhrAfterReported(ohr);
+                    MessageLogger.LogOperation("DataPolling",
+                        string.Format("The Data Update Request: {0} was sent", ohr.CustomerUpdateUniqueId));
+                }
+                catch (Exception ex)
+                {
+                    ExceptionHandler.HandleException(ex);
+                }
+            }
+        }
+
         private void SearchSubmittedCbr()
         {
             Cbr cbr = cbrManager.GetFirstSentCbr();
@@ -130,15 +176,26 @@ namespace DIS.Business.Proxy
             }
         }
 
+        private void UpdateOhrAfterReported(Ohr ohr)
+        {
+            using (KeyStoreContext context = KeyStoreContext.GetContext())
+            {
+                ohrManager.UpdateOhrAfterReported(ohr, context);
+                UpdateKeysAfterReportOhr(ohr, context);
+                context.SaveChanges();
+            }
+        }
+
         //get CBR.Ack from MS in the background 
         private void RetrieveCbrAcks()
         {
             List<Cbr> cbrs = cbrManager.GetReportedCbrs()
-                .Where(c => c.MsReportUniqueId.HasValue).ToList();
+                .Where(c => c.MsReportUniqueId.HasValue)
+                .Union(cbrManager.GetFailedCbrs()).ToList();
             if (cbrs.Count > 0)
             {
                 Guid[] readyCbrIds = msClient.RetrieveCbrAcks();
-                cbrs = cbrs.Where(c => readyCbrIds.Contains(c.MsReportUniqueId.Value)).Union(cbrManager.GetFailedCbrs()).ToList();
+                cbrs = cbrs.Where(c => readyCbrIds.Contains(c.MsReportUniqueId.Value)).ToList();
                 cbrManager.UpdateCbrsAfterAckReady(cbrs);
             }
 
@@ -164,6 +221,43 @@ namespace DIS.Business.Proxy
             }
         }
 
+        private void RetrieveOhrAcks()
+        {
+            List<Ohr> ohrs = ohrManager.GetReportedOhrs()
+                .Where(c => c.MsUpdateUniqueId.HasValue)
+                .Union(ohrManager.GetFailedOhrs()).ToList();
+            if (ohrs.Count > 0)
+            {
+                Guid[] readyOhrIds = msClient.RetrieveOhrAcks();
+                ohrs = ohrs.Where(c => readyOhrIds.Contains(c.MsUpdateUniqueId.Value)).ToList();
+                ohrManager.UpdateOhrsAfterAckReady(ohrs);
+            }
+
+            ohrs = ohrManager.GetReadyOhrs();
+            foreach (Ohr ohr in ohrs)
+            {
+                try
+                {
+                    Ohr ohrWithAck = msClient.RetrieveOhrAck(ohr);
+                    using (KeyStoreContext context = KeyStoreContext.GetContext())
+                    {
+                        Ohr dbOhr = ohrManager.UpdateOhrAfterAckRetrieved(ohrWithAck, context);
+                        var result = base.UpdateKeysAfterRetrieveOhrAck(dbOhr, context);
+                        if (GetIsCarbonCopy())
+                            base.UpdateKeysToCarbonCopy(result, true, context);
+                        context.SaveChanges();
+
+                        MessageLogger.LogOperation("DataPolling", 
+                            string.Format("The Data Update Ack: {0} was retrieved", ohrWithAck.CustomerUpdateUniqueId));
+                    }
+                }
+                catch (WebProtocolException)
+                {
+                    ohrManager.UpdateOhrWhenAckFailed(ohr);
+                }
+            }
+        }
+
         public void DoRecurringTasks()
         {
             switch (Constants.InstallType)
@@ -173,7 +267,9 @@ namespace DIS.Business.Proxy
                     {
                         // CKI send failed CBR report to Microsoft.
                         IgnoreException(SendGeneratedCbrs);
+                        IgnoreException(SendGeneratedOhrs);
                         IgnoreException(RetrieveCbrAcks);
+                        IgnoreException(RetrieveOhrAcks);
                         // CKI send failed return report to Microsoft
                         IgnoreException(SendGeneratedReturnReports);
                         IgnoreException(RetrieveReturnReportAcks);
@@ -185,7 +281,9 @@ namespace DIS.Business.Proxy
                     {
                         // FKI send failed CBR to Microsoft.
                         IgnoreException(SendGeneratedCbrs);
+                        IgnoreException(SendGeneratedOhrs);
                         IgnoreException(RetrieveCbrAcks);
+                        IgnoreException(RetrieveOhrAcks);
 
                         if (GetIsCarbonCopy())
                         {
@@ -283,8 +381,8 @@ namespace DIS.Business.Proxy
 
             using (KeyStoreContext context = KeyStoreContext.GetContext())
             {
-                base.UpdateSyncState(keys, true, context);
                 cbrManager.GenerateCbr(keys, false, context);
+                base.UpdateSyncState(keys, true, context);              
                 context.SaveChanges();
             }
             return keys.Select(k => new KeyOperationResult()

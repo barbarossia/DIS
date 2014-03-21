@@ -54,6 +54,7 @@ namespace DIS.Data.DataAccess.Repository
         {
             UsingContext(ref context, () =>
             {
+                context.Configuration.AutoDetectChangesEnabled = false;
                 UpdateReturnKeyAck(context, returnKey);
             });
         }
@@ -65,10 +66,13 @@ namespace DIS.Data.DataAccess.Repository
                 context.Configuration.AutoDetectChangesEnabled = false;
                 UpdateReturnKeyAck(context, returnKey);
 
-                foreach (ReturnReportKey key in returnKey.ReturnReportKeys)
+                if (returnKey.ReturnReportKeys != null)
                 {
-                    context.ReturnReportKeys.Attach(key);
-                    context.Entry(key).State = EntityState.Modified;
+                    foreach (ReturnReportKey key in returnKey.ReturnReportKeys)
+                    {
+                        context.ReturnReportKeys.Attach(key);
+                        context.Entry(key).State = EntityState.Modified;
+                    }
                 }
             });
         }

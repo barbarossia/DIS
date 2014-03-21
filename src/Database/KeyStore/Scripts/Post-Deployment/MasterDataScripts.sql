@@ -19,7 +19,8 @@ BEGIN
     insert Configuration(Name,Value,[Type]) values(N'ReportInterval', '<int>600000</int>', N'System.Int32')
     insert Configuration(Name,Value,[Type]) values(N'IsAutoFulfillmentOn', '<boolean>false</boolean>', N'System.Boolean')
     insert Configuration(Name,Value,[Type]) values(N'IsAutoReportOn', '<boolean>false</boolean>', N'System.Boolean')
-    insert Configuration(Name,Value,[Type]) values(N'OldTimeline', '<int>180</int>', N'System.Int32')
+     insert Configuration(Name,Value,[Type]) values(N'IsRequireOHRData', '<boolean>false</boolean>', N'System.Boolean')
+	insert Configuration(Name,Value,[Type]) values(N'OldTimeline', '<int>180</int>', N'System.Int32')
     insert Configuration(Name,Value,[Type]) values(N'IsEncryptExportedFile', '<boolean>true</boolean>', N'System.Boolean')
     insert Configuration(Name,Value,[Type]) values(N'CertificateSubject', 
 	'<DisCert xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">

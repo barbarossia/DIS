@@ -150,10 +150,19 @@
   <data name="EditOptionalInfo_zTouchScerrn" xml:space="preserve">
     <value>ZTOUCH_SCREEN</value>
   </data>
+  <data name="NoAssignLabel" xml:space="preserve">
+    <value>NULL</value>
+  </data>
   <data name="OhrDataMissedFormat" xml:space="preserve">
     <value>{0} 繫結金鑰遺失 OHR 資料.</value>
   </data>
   <data name="RequireOHRDataLabel" xml:space="preserve">
     <value>視需要標示 OHR 資料</value>
+  </data>
+  <data name="ReturnTypeLabel" xml:space="preserve">
+    <value>Return Type ID:</value>
+  </data>
+  <data name="ScreenValueFormatMsg" xml:space="preserve">
+    <value>請檢查 Screen Size的值, 格式爲整數或者小數.</value>
   </data>
 </root>

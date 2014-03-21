@@ -15,6 +15,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using DIS.Data.DataContract;
+using DIS.Data.ServiceContract;
 using OA3ToolKeyInfo = DIS.Data.DataContract.OA3ToolKeyInfo;
 using OA3ToolReportKeyInfo = DIS.Data.DataContract.OA3ToolReportKeyInfo;
 using System.IO;
@@ -26,6 +27,8 @@ using System.Security.Cryptography.X509Certificates;
 using DIS.Common.Utility;
 using System.Configuration;
 using System.Security.Cryptography;
+using DIS.Business.Library.Properties;
+using System.Runtime.Serialization;
 
 namespace DIS.Business.Library
 {
@@ -259,6 +262,15 @@ namespace DIS.Business.Library
         public static List<KeyInfo> ToSyncServiceContract(this List<KeyInfo> keys)
         {
             return keys.Select(key => new KeyInfo() { KeyId = key.KeyId }).ToList();
+        }
+
+        public static string SaveServiceContractToFile(object obj, string outputPath)
+        {
+            string xml = obj.ToDataContract();
+            XmlDocument xDoc = new XmlDocument();
+            xDoc.LoadXml(xml);
+            xDoc.Save(outputPath);
+            return xDoc.DocumentElement.OuterXml;
         }
     }
 }

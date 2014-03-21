@@ -19,6 +19,7 @@ using DIS.Business.Library;
 using DIS.Data.DataContract;
 using Microsoft.ServiceModel.Web;
 using DIS.Common.Utility;
+using System.Net;
 
 namespace DIS.Business.Proxy
 {
@@ -84,6 +85,22 @@ namespace DIS.Business.Proxy
                 });
         }
 
+        public DiagnosticResult TestDatabaseDiskFull()
+        {
+            ServiceClient internalClient = new ServiceClient(null, CallDirection.Internal, user);
+            DiagnosticResult diagnosticResult = new DiagnosticResult();
+            try
+            {
+                bool result = internalClient.TestDatabaseDiskFull();
+                diagnosticResult.DiagnosticResultType = result ? DiagnosticResultType.Error : DiagnosticResultType.Ok;
+            }
+            catch (Exception ex)
+            {
+                MessageLogger.LogSystemError(MessageLogger.GetMethodName(), ex.Message);
+            }
+            return diagnosticResult;
+        }
+
         public void DataPollingServiceReport()
         {
             ServiceClient internalClient = new ServiceClient(null, CallDirection.Internal, user);
@@ -94,6 +111,12 @@ namespace DIS.Business.Proxy
         {
             ServiceClient internalClient = new ServiceClient(null, CallDirection.Internal, user);
             internalClient.KeyProviderServiceReport();
+        }
+
+        public void DatabaseDiskFullReport()
+        {
+            ServiceClient internalClient = new ServiceClient(null, CallDirection.Internal, user);
+            internalClient.DatabaseDiskFullReport(false);
         }
 
         #endregion
@@ -113,6 +136,7 @@ namespace DIS.Business.Proxy
             }
             return diagnosticResult;
         }
+
     }
 }
 

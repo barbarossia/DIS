@@ -14,6 +14,7 @@ using System;
 using System.Windows;
 using System.Windows.Data;
 using DIS.Common.Utility;
+using DIS.Data.DataContract;
 
 namespace DIS.Presentation.KMT.Behaviors
 {
@@ -69,5 +70,39 @@ namespace DIS.Presentation.KMT.Behaviors
         }
 
         #endregion
+    }
+
+    public class ReasonCodeConverterVisibility : IValueConverter
+    {
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="targetType"></param>
+        /// <param name="parameter"></param>
+        /// <param name="culture"></param>
+        /// <returns></returns>
+        public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            Visibility rv = Visibility.Visible;
+            if (value == null || value.ToString() == Constants.CBRAckReasonCode.ActivationEnabled)
+                rv = Visibility.Visible;
+            else
+                rv = Visibility.Collapsed;
+            return rv;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="targetType"></param>
+        /// <param name="parameter"></param>
+        /// <param name="culture"></param>
+        /// <returns></returns>
+        public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            return value;
+        }
     }
 }

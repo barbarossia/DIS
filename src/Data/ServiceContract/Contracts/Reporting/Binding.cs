@@ -29,5 +29,8 @@ namespace DIS.Data.ServiceContract
 
         [DataMember(Order = 3)]
         public OEMOptionalInfoExtendedProperty[] OEMOptionalInfo { get; set; }
+
+        [DataMember(Order = 4)]
+        public OEMHardwareReport OEMHardwareReport { get; set; }
    }
 }

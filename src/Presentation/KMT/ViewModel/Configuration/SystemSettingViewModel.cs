@@ -53,6 +53,8 @@ namespace DIS.Presentation.KMT.ViewModel
         private string sourceOldTimeLine;
         private string sourceCertSubject;
         private string sourceMsServiceConfig;
+        private string sourceThumbprint;
+        private string thumbprint;
         private DisCert selectedCert;
         private DelegateCommand selectCertCommand;
 
@@ -108,7 +110,7 @@ namespace DIS.Presentation.KMT.ViewModel
             get { return sourceOldTimeLine != OldTimeLine; }
         }
 
-        private bool isCertChanged { get { return this.CertificateSubject != this.sourceCertSubject; } }
+        private bool isCertChanged { get { return sourceThumbprint != thumbprint; } }
 
         #endregion
 
@@ -213,7 +215,7 @@ namespace DIS.Presentation.KMT.ViewModel
         public bool IsRequireOHRData
         {
             get { return this.isRequireOHRData; }
-            set 
+            set
             {
                 this.isRequireOHRData = value;
                 RaisePropertyChanged("IsRequireOHRData");
@@ -233,7 +235,7 @@ namespace DIS.Presentation.KMT.ViewModel
                     || isRequireOHRDataChanged
                     || isCertChanged
                     || IsMsServiceConfiglChanged;
-                    
+
             }
         }
 
@@ -413,10 +415,10 @@ namespace DIS.Presentation.KMT.ViewModel
                             hqProxy.UpdateHeadQuarter(KmtConstants.CurrentHeadQuarter);
                         }
                         sourceCertSubject = CertificateSubject;
+                        sourceThumbprint = thumbprint;
                         MessageLogger.LogOperation(KmtConstants.LoginUser.LoginId,
                             string.Format("Microsoft Certificate Subject was changed to {0}", this.selectedCert.Subject));
                         configProxy.UpdateMsServiceEnabledSwitch(true);
-
                     }
                     LoadConfigurations();
                     IsSaved = true;
@@ -442,7 +444,7 @@ namespace DIS.Presentation.KMT.ViewModel
         {
             Window parent = GetCurrentWindow();
             IntPtr windowHandle = new WindowInteropHelper(parent).Handle;
-            
+
             X509Certificate2Collection selectedCerts =
                 X509Certificate2UI.SelectFromCollection(EncryptionHelper.GetMSCertificates(),
                 ResourcesOfR6.CertVM_CertPickerTitle,
@@ -458,6 +460,7 @@ namespace DIS.Presentation.KMT.ViewModel
                     ThumbPrint = sc.Thumbprint
                 };
                 this.CertificateSubject = selectedCert.Subject;
+                this.thumbprint = selectedCert.ThumbPrint;
             }
         }
 
@@ -483,9 +486,15 @@ namespace DIS.Presentation.KMT.ViewModel
 
             DisCert cert = configProxy.GetCertificateSubject();
             if (KmtConstants.IsOemCorp)
+            {
                 CertificateSubject = cert.Subject;
+                thumbprint = cert.ThumbPrint;
+            }
             if (KmtConstants.IsTpiCorp && KmtConstants.CurrentHeadQuarter != null)
+            {
                 CertificateSubject = KmtConstants.CurrentHeadQuarter.CertSubject;
+                thumbprint = KmtConstants.CurrentHeadQuarter.CertThumbPrint;
+            }
 
             sourceCertSubject = CertificateSubject;
             sourceFulfillmentInterval = FulfillmentInterval;
@@ -494,9 +503,10 @@ namespace DIS.Presentation.KMT.ViewModel
             sourceInternalServicePort = InternalServicePort;
             sourceIsAutoFulfillment = IsAutoFulfillment;
             sourceIsAutoReport = IsAutoReport;
-            sourceIsRequireOHRData=IsRequireOHRData;
+            sourceIsRequireOHRData = IsRequireOHRData;
             sourceOldTimeLine = OldTimeLine;
             sourceMsServiceConfig = MsServiceConfig;
+            sourceThumbprint = thumbprint;
         }
 
         private bool ValidateConfigurations()

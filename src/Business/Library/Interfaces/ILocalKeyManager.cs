@@ -71,6 +71,9 @@ namespace DIS.Business.Library
         // Offline-CBR to microsoft
         List<KeyOperationResult> ExportCbr(ExportParameters exportParameters, Func<List<KeyInfo>, string> generateCbrToFile);
 
+        // Offline OHR Data to microsoft
+        List<KeyOperationResult> ExportOHRData(ExportParameters exportParameters, Func<List<KeyInfo>, string> generateOHRDataToFile);
+
         List<KeyOperationResult> UpdateOemOptionInfo(List<KeyInfo> keys, OemOptionalInfo optionalInfo);
 
         #endregion
@@ -157,6 +160,8 @@ namespace DIS.Business.Library
         List<KeyInfo> SearchBoundKeysToReport(List<KeyGroup> keyGroups);
 
         List<KeyInfo> SearchBoundKeysToMs(KeySearchCriteria searchCriteria);
+
+        List<KeyInfo> SearchOhrKeysToMs(KeySearchCriteria searchCriteria);
 
         List<KeyGroup> SearchBoundKeyGroupsToMs(KeySearchCriteria searchCriteria);
 

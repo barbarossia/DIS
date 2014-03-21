@@ -23,6 +23,8 @@
 
         <Behaviors:EnumConverter x:Key="enumConverter"/>
 
+        <Behaviors:TouchScreenEnumConverter x:Key="touchScreenEnumConverter"/>
+
         <Behaviors:BoolToVisibilityConverter x:Key="boolToVis"/>
 
         <Behaviors:OperationResultConverter x:Key="OperationResultConverter"/>

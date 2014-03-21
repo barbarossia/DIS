@@ -49,11 +49,32 @@ namespace DIS.Business.Library
                 k => keyRepository.UpdateKeys(k, false, null));
         }
 
+        public List<KeyOperationResult> ExportOHRData(ExportParameters exportParameters, Func<List<KeyInfo>, string> generateOHRDataToFile)
+        {
+            var keys = ConvertKeyGroupsToKeys(exportParameters);
+            var result = ValidateKeys(keys, (k1, k2) => ValidateOHRDataKey(k1, k2));
+            if (result.All(r => !r.Failed))
+            {
+                var fileContent = generateOHRDataToFile(keys);
+            }
+            return result;
+        }
+
         private KeyErrorType ValidateReportedBoundKey(KeyInfo key, KeyInfo keyInDb)
         {
             if (keyInDb == null)
                 return KeyErrorType.NotFound;
             else if (!ValidateKeyState(keyInDb.UlsReportingBoundKeyToMs))
+                return KeyErrorType.StateInvalid;
+            else
+                return KeyErrorType.None;
+        }
+
+        private KeyErrorType ValidateOHRDataKey(KeyInfo key, KeyInfo keyInDb)
+        {
+            if (keyInDb == null)
+                return KeyErrorType.NotFound;
+            else if (!ValidateKeyState(keyInDb.UlsExportOHRData))
                 return KeyErrorType.StateInvalid;
             else
                 return KeyErrorType.None;

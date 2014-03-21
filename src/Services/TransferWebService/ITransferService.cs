@@ -63,6 +63,18 @@ namespace DIS.Services.TransferWebService
         [WebInvoke(UriTemplate = "/return/acknowledgements", Method = "POST")]
         ReturnReport RetrieveReturnAck(ReturnReport request);
 
+        [OperationContract]
+        [WebInvoke(UriTemplate = "/oemhardwarereporting/royd/v1/", Method = "POST")]
+        Guid ReportOhr(Ohr ohr);
+
+        [OperationContract]
+        [WebGet(UriTemplate = "/oemhardwarereporting/royd/v1/acknowledgements")]
+        Guid[] RetrieveOhrAcks();
+
+        [OperationContract]
+        [WebInvoke(UriTemplate = "/oemhardwarereporting/royd/v1/acknowledgements", Method = "POST")]
+        Ohr RetrieveOhrAck(Ohr ohr);
+
         #endregion
 
         #region ULS/DLS web services
@@ -91,6 +103,13 @@ namespace DIS.Services.TransferWebService
         [WebGet(UriTemplate = "/Diagnostic/KPS/Report")]
         void KeyProviderServiceReport();
 
+        [OperationContract]
+        [WebGet(UriTemplate = "/Diagnostic/DatabaseDiskFull")]
+        bool TestDatabaseDiskFull();
+
+        [OperationContract]
+        [WebInvoke(UriTemplate = "/Diagnostic/DatabaseDiskFull/Report", Method = "POST")]
+        void DatabaseDiskFullReport(bool isFull);
 
         [OperationContract]
         [WebGet(UriTemplate = "/Keys/Get")]

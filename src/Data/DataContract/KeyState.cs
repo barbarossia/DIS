@@ -34,5 +34,7 @@ namespace DIS.Data.DataContract
 
         Assigned = 11,
         Retrieved = 12,
+
+        ActivationEnabledPendingUpdate = 13,
     }
 }

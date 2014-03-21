@@ -26,10 +26,13 @@ namespace DIS.Data.ServiceContract
         [DataMember(Order = 3)]
         public OEMOptionalInfoError[] OEMOptionalInfoErrors { get; set; }
 
-        [DataMember(Order = 4)]
-        public string ReasonCode { get; set; }
+        [DataMember(Order = 4, EmitDefaultValue = false)]
+        public OEMHardwareReportError[] OEMHardwareReportErrors { get; set; }
 
         [DataMember(Order = 5)]
+        public string ReasonCode { get; set; }
+
+        [DataMember(Order = 6)]
         public string ReasonCodeDescription { get; set; }
     }
 }

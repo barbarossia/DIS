@@ -23,6 +23,7 @@ using DIS.Presentation.KMT.Properties;
 using DIS.Presentation.KMT.ViewModel.ControlsViewModel;
 using System.Windows.Input;
 using System.Windows;
+using DIS.Presentation.KMT.Behaviors;
 
 namespace DIS.Presentation.KMT.ViewModel.Key
 {
@@ -528,7 +529,7 @@ namespace DIS.Presentation.KMT.ViewModel.Key
         {
             List<string> lists = new List<string>();
             lists.Add(string.Empty);
-            OHRData.ZFRM_FACTORValue.Select(k => k.Key).ToList().ForEach(k => { lists.Add(k); });
+            OHRData.ZFRM_FACTORValue.Select(k => k.Key).ToList().ForEach(k => { lists.Add(k.ToString()); });
             this.zfrm_factor_cl1s = lists;
         }
 
@@ -537,7 +538,7 @@ namespace DIS.Presentation.KMT.ViewModel.Key
             List<string> lists = new List<string>();
             lists.Add(string.Empty);
             if (!string.IsNullOrEmpty(factor1value))
-                OHRData.ZFRM_FACTORValue.Where(k => k.Key == factor1value).FirstOrDefault().Value.ForEach(k => { lists.Add(k); });
+                OHRData.ZFRM_FACTORValue.Where(k => k.Key.ToString() == factor1value).FirstOrDefault().Value.ForEach(k => { lists.Add(k.ToString()); });
             this.zfrm_factor_cl2s = lists;
         }
 
@@ -545,7 +546,7 @@ namespace DIS.Presentation.KMT.ViewModel.Key
         {
             List<string> lists = new List<string>();
             lists.Add(string.Empty);
-            OHRData.ZTOUCH_SCREENValue.ForEach(k => lists.Add(k));
+            OHRData.ZTOUCH_SCREENValue.ForEach(k => lists.Add(EnumHelper.GetFieldDecription(typeof(TouchEnum), k)));
             this.ztouch_screens = lists;
         }
 
@@ -571,6 +572,13 @@ namespace DIS.Presentation.KMT.ViewModel.Key
             if (!string.IsNullOrEmpty(this.ZPGM_ELIG_VALUES) && System.Text.UTF8Encoding.UTF8.GetBytes(this.ZPGM_ELIG_VALUES).Length > 48)
                 error += MergedResources.EditOptionalInfoViewModel_ProEligValueError;
 
+            if (!string.IsNullOrEmpty(this.ZSCREEN_SIZE))
+            {
+                string DecimalRegEx = @"^[0-9]+(\.[0-9]+)?$";
+                bool bl = System.Text.RegularExpressions.Regex.IsMatch(this.ZSCREEN_SIZE, DecimalRegEx);
+                if (!bl)
+                    error += ResourcesOfRTMv1_6.ScreenValueFormatMsg;
+            }
             if (error != null)
             {
                 ValidationHelper.ShowMessageBox(error, Properties.MergedResources.Common_Error);

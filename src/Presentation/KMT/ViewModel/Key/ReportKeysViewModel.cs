@@ -133,7 +133,23 @@ namespace DIS.Presentation.KMT.ViewModel
             return true;
         }
 
+        private bool CheckCbrTouchScreenValue(KeyInfo key)
+        {
+            bool result = false;
+            if (!string.IsNullOrEmpty(key.ZTOUCH_SCREEN))
+            {
+                try
+                {
+                    OemOptionalInfo.ConvertTouchEnum(key.ZTOUCH_SCREEN);
+                }
+                catch(ApplicationException)
+                {
+                    result = false;
+                }
+            }
 
+            return result;
+        }
 
         protected override bool ValidateKeys()
         {
@@ -154,6 +170,11 @@ namespace DIS.Presentation.KMT.ViewModel
                         if (confirm != MessageBoxResult.OK)
                             return false;
                     }
+                }
+                if (base.Keys.Where(k => k.IsSelected).Any(k => CheckCbrTouchScreenValue(k.keyInfo)))
+                {
+                    MessageBox.Show(ResourcesOfRTMv1_8.ReportKeysViewModel_InvalidateTouchScreen, MergedResources.Common_Error, MessageBoxButton.OK, MessageBoxImage.Error);
+                    return false;
                 }
             }
             return true;

@@ -168,6 +168,26 @@ namespace DIS.Presentation.KMT.Behaviors
             }
         }
 
+        private static void DecimalCancelCommand(object sender, DataObjectPastingEventArgs e)
+        {
+            bool isAlphaNumeric = false;
+            string AlphaNumberRegEx = @"^[0-9]+(\.[0-9]+)?$";// @"\d+\.?\d{0,4}"; // Regular expression to check AlphaNumeric values
+            string value = string.Empty;
+            if (e.DataObject.GetDataPresent(typeof(string)))
+            {
+                // Get the copied value to the clipboard
+                value = e.DataObject.GetData(typeof(string)).ToString();
+
+                // Verify with Alphanumeric Regular expression
+                isAlphaNumeric = System.Text.RegularExpressions.Regex.IsMatch(value, AlphaNumberRegEx);
+            }
+
+            if (!isAlphaNumeric)
+            {
+                // Dont allow to paste
+                e.CancelCommand();
+            }
+        }
 
         /// <summary>
         /// Verifies pressed key is a Digit or not
@@ -227,7 +247,7 @@ namespace DIS.Presentation.KMT.Behaviors
 
         private static void TextBoxKeyDown(object sender, KeyEventArgs e)
         {
-            
+
             bool handled = true;
 
             // Check if it is valid key, digit, letter
@@ -257,6 +277,27 @@ namespace DIS.Presentation.KMT.Behaviors
             e.Handled = handled;
         }
 
+        private static void DecimalTextBoxKeyDown(object sender, KeyEventArgs e)
+        {
+
+            bool handled = true;
+
+            var textBox = (TextBox)sender;
+            if (textBox == null)
+                return;
+            string txt = textBox.Text;
+            // Check if it is valid key, digit, letter
+            if ((controlKeys.Contains(e.Key) || IsDigit(e.Key)) ||
+                (txt.IndexOf('.') == -1) && (e.Key == Key.OemPeriod || e.Key == Key.Decimal))
+            {
+                // Allow to press
+                handled = false;
+            }
+
+            // Dont allow to press
+            e.Handled = handled;
+        }
+
         private static void FilterSpaceKeyDown(object sender, KeyEventArgs e)
         {
             bool handled = false;
@@ -271,7 +312,7 @@ namespace DIS.Presentation.KMT.Behaviors
 
         #region Public Methods
 
-        
+
         /// <summary>
         /// Gets IsSpecialAlphaNumericFilterProperty
         /// </summary>
@@ -282,7 +323,7 @@ namespace DIS.Presentation.KMT.Behaviors
             return (bool)src.GetValue(IsRmaAlphaNumericFilterProperty);
         }
 
-       
+
 
         /// <summary>
         /// Sets IsSpecialAlphaNumericFilterProperty
@@ -299,12 +340,34 @@ namespace DIS.Presentation.KMT.Behaviors
         /// </summary>
         /// <param name="src"></param>
         /// <returns></returns>
+        public static bool GetIsDecimalFilter(DependencyObject src)
+        {
+            return (bool)src.GetValue(IsDecimalFilterProperty);
+        }
+
+
+
+        /// <summary>
+        /// Sets IsAlphaNumericFilterProperty
+        /// </summary>
+        /// <param name="src"></param>
+        /// <param name="value"></param>
+        public static void SetIsDecimalFilter(DependencyObject src, bool value)
+        {
+            src.SetValue(IsDecimalFilterProperty, value);
+        }
+
+        /// <summary>
+        /// Gets IsAlphaNumericFilterProperty
+        /// </summary>
+        /// <param name="src"></param>
+        /// <returns></returns>
         public static bool GetIsAlphaNumericFilter(DependencyObject src)
         {
             return (bool)src.GetValue(IsAlphaNumericFilterProperty);
         }
 
-       
+
 
         /// <summary>
         /// Sets IsAlphaNumericFilterProperty
@@ -335,8 +398,7 @@ namespace DIS.Presentation.KMT.Behaviors
         {
             src.SetValue(IsAlphaNumericFilterProperty, value);
         }
-        
-        
+
         /// <summary>
         /// The event occurs on IsAlphaNumericFilterProperty changed
         /// </summary>
@@ -358,7 +420,7 @@ namespace DIS.Presentation.KMT.Behaviors
                 }
             }
         }
-         /// <summary>
+        /// <summary>
         /// The event occurs on IsAlphaNumericFilterProperty changed
         /// </summary>
         /// <param name="src"></param>
@@ -378,6 +440,24 @@ namespace DIS.Presentation.KMT.Behaviors
                 }
             }
         }
+
+        public static void IsDecimalFilterChanged(DependencyObject src, DependencyPropertyChangedEventArgs args)
+        {
+            if (src != null && src is TextBox)
+            {
+                TextBox textBox = src as TextBox;
+
+                InputMethod.SetIsInputMethodEnabled(src, false);
+
+                if ((bool)args.NewValue)
+                {
+                    textBox.PreviewKeyDown += FilterSpaceKeyDown;
+                    textBox.KeyDown += DecimalTextBoxKeyDown;
+                    DataObject.AddPastingHandler(textBox, DecimalCancelCommand);
+                }
+            }
+        }
+
 
         /// <summary>
         /// The event occurs on IsNumericFilterProperty changed
@@ -420,6 +500,11 @@ namespace DIS.Presentation.KMT.Behaviors
             DependencyProperty.RegisterAttached(
             "IsAlphaNumericFilter", typeof(bool), typeof(TextBoxFilters),
             new PropertyMetadata(false, IsAlphaNumericFilterChanged));
+
+        public static DependencyProperty IsDecimalFilterProperty =
+         DependencyProperty.RegisterAttached(
+         "IsDecimalFilter", typeof(bool), typeof(TextBoxFilters),
+         new PropertyMetadata(false, IsDecimalFilterChanged));
 
         /// <summary>
         /// The Property indicates if the text is numeric

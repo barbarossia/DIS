@@ -38,8 +38,26 @@ namespace DIS.Business.Proxy
             if (!configManager.GetIsMsServiceEnabled())
                 return -1;
 
-            fulfillManager.RetrieveFulfilment(msClient.GetFulfilments(),
-                f => msClient.FulfillKeys(f.FulfillmentNumber));
+            try
+            {
+                fulfillManager.RetrieveFulfilment(msClient.GetFulfilments(),
+                    f => msClient.FulfillKeys(f.FulfillmentNumber));
+            }
+            catch (System.Data.Entity.Infrastructure.DbUpdateException ex)
+            {
+                if (ex.InnerException != null &&
+                    ex.InnerException.InnerException != null &&
+                    ex.InnerException.InnerException.GetType() == typeof(System.Data.SqlClient.SqlException))
+                {
+                    System.Data.SqlClient.SqlException sqlException = (System.Data.SqlClient.SqlException)ex.InnerException.InnerException;
+                    if (sqlException.Number == 1105) //Could not allocate space for object
+                    {
+                        msClient.DatabaseDiskFullReport(true);
+                        fulfillManager.UpdateFulfillmentFailedWhenDiskIsFull();
+                        return -1;
+                    }
+                }
+            }
 
             bool? shouldBeCarbonCopy = GetIsCarbonCopy() ? (bool?)true : null;
 

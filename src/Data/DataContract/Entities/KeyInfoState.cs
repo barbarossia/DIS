@@ -65,9 +65,10 @@ namespace DIS.Data.DataContract
         {
             InstallTypeShouldBe(InstallType.Oem);
 
-            KeyStateShouldBe(KeyState.Fulfilled);
+            KeyStateShouldBe(KeyState.Fulfilled, KeyState.ActivationEnabled);
 
-            KeyStateWrapper = isEnabled ? KeyState.ActivationEnabled : KeyState.ActivationDenied;
+            if (KeyState == KeyState.Fulfilled)
+                KeyStateWrapper = isEnabled ? KeyState.ActivationEnabled : KeyState.ActivationDenied;
         }
 
         public void OemReceivingReturnReportedCarbonCopyKey()
@@ -170,6 +171,13 @@ namespace DIS.Data.DataContract
                 KeyStateShouldBe(KeyType.Standard, KeyState.ReportedBound);
 
             KeyStateWrapper = isEnabled ? KeyState.ActivationEnabled : KeyState.ActivationDenied;
+        }
+
+        public void UlsExportOHRData()
+        {
+            InstallTypeShouldBe(InstallType.Uls);
+            KeyTypeShouldBe(KeyType.Standard);
+            KeyStateShouldBe(KeyType.Standard, KeyState.ActivationDenied, KeyState.ActivationEnabled);
         }
 
         public void FactoryFloorAssembleKey()
@@ -302,6 +310,26 @@ namespace DIS.Data.DataContract
             KeyStateShouldBe(KeyType.MBR, KeyState.ActivationEnabled);
 
             KeyStateWrapper = KeyState.Returned;
+        }
+
+        public void UlsReportingOhrToMs()
+        {
+            InstallTypeShouldBe(InstallType.Uls);
+            KeyTypeShouldBe(KeyType.Standard);
+
+            KeyStateShouldBe(KeyType.Standard, KeyState.ActivationEnabled);
+
+            KeyStateWrapper = KeyState.ActivationEnabledPendingUpdate;
+        }
+
+        public void UlsReceivingOhrAck()
+        {
+            InstallTypeShouldBe(InstallType.Uls);
+            KeyTypeShouldBe(KeyType.Standard);
+
+            KeyStateShouldBe(KeyType.Standard, KeyState.ActivationEnabledPendingUpdate);
+
+            KeyStateWrapper = KeyState.ActivationEnabled;
         }
 
         private void KeyTypeShouldBe(KeyType keyType)

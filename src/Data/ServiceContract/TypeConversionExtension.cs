@@ -58,14 +58,64 @@ namespace DIS.Data.ServiceContract
                             {
                                 ProductKeyID = k.KeyId,
                                 HardwareHash = k.HardwareHash,
-                                OEMOptionalInfo = info.Values.Any(p => !string.IsNullOrEmpty(p.Value)) ?
-                                    info.Values.Where(p => !string.IsNullOrEmpty(p.Value)).Select(p => new OEMOptionalInfoExtendedProperty()
-                                    {
-                                        Name = p.Key,
-                                        Value = p.Value
-                                    }).ToArray() : null
+                                OEMOptionalInfo = info.ToOEMOptionalInfoExtendedProperty(),
+                                OEMHardwareReport = info.ToOEMHardwareReport(),
                             }).ToArray(),
             };
+        }
+
+        public static OEMOptionalInfoExtendedProperty[] ToOEMOptionalInfoExtendedProperty(this DC.OemOptionalInfo info)
+        {
+            if (info.Values.Any(p => !string.IsNullOrEmpty(p.Value) &&
+                                        (p.Key == DC.OhrName.ZOEMEXTID ||
+                                         p.Key == DC.OhrName.ZMANUFGEOLOC ||
+                                         p.Key == DC.OhrName.ZPGMELIGVAL ||
+                                         p.Key == DC.OhrName.ZCHANNELRELID)))
+                return info.Values.Where(p => !string.IsNullOrEmpty(p.Value) &&
+                                        (p.Key == DC.OhrName.ZOEMEXTID ||
+                                         p.Key == DC.OhrName.ZMANUFGEOLOC ||
+                                         p.Key == DC.OhrName.ZPGMELIGVAL ||
+                                         p.Key == DC.OhrName.ZCHANNELRELID)).Select(p => new OEMOptionalInfoExtendedProperty()
+                                         {
+                                             Name = p.Key,
+                                             Value = p.Value
+                                         }).ToArray();
+            return null;
+
+        }
+
+        public static OEMHardwareReport ToOEMHardwareReport(this DC.OemOptionalInfo info)
+        {
+            if (!string.IsNullOrEmpty(info.ZFRM_FACTOR_CL1) ||
+                !string.IsNullOrEmpty(info.ZFRM_FACTOR_CL2) ||
+                !string.IsNullOrEmpty(info.ZTOUCH_SCREEN) ||
+                !string.IsNullOrEmpty(info.ZSCREEN_SIZE) ||
+                !string.IsNullOrEmpty(info.ZPC_MODEL_SKU))
+            {
+                OEMHardwareReport ohrData = new OEMHardwareReport();
+                if (!string.IsNullOrEmpty(info.ZFRM_FACTOR_CL1))
+                    ohrData.FRM_FACTOR_CL1 = (FormFactorL1Enum)Enum.Parse(typeof(FormFactorL1Enum), info.ZFRM_FACTOR_CL1, true);
+                if (!string.IsNullOrEmpty(info.ZFRM_FACTOR_CL2))
+                    ohrData.FRM_FACTOR_CL2 = (FormFactorL2Enum)Enum.Parse(typeof(FormFactorL2Enum), info.ZFRM_FACTOR_CL2, true);
+                if (!string.IsNullOrEmpty(info.ZTOUCH_SCREEN))
+                    ohrData.TOUCH_SCREEN = ConvertTouchEnum(info.ZTOUCH_SCREEN);
+                if (!string.IsNullOrEmpty(info.ZSCREEN_SIZE))
+                    ohrData.SCREEN_SIZE = Decimal.Parse(info.ZSCREEN_SIZE);
+                if (!string.IsNullOrEmpty(info.ZPC_MODEL_SKU))
+                    ohrData.PC_MODEL_SKU = info.ZPC_MODEL_SKU;
+
+                return ohrData;
+            }
+
+            return null;
+        }
+
+        private static TouchEnum ConvertTouchEnum(string value)
+        {
+            if (string.Compare(value.Trim(), TouchEnum.Touch.ToString(), ignoreCase: true) == 0)
+                return TouchEnum.Touch;
+            else
+                return TouchEnum.Nontouch;
         }
 
         public static ReturnRequest ToReturnReport(this DC.ReturnReport returnReport)
@@ -84,7 +134,7 @@ namespace DIS.Data.ServiceContract
                                        OEMRMALineNumber = reportKey.OemRmaLineNumber
                                    }
                                    ).ToArray(),
-            };   
+            };
         }
 
         public static DC.Cbr FromServiceContract(this ComputerBuildReportAckResponse response)
@@ -178,7 +228,7 @@ namespace DIS.Data.ServiceContract
                 CbrUniqueId = request.CustomerReportUniqueID,
                 SoldToCustomerId = request.SoldToCustomerID,
                 ReceivedFromCustomerId = request.ReceivedFromCustomerID,
-                CbrKeys = request.Bindings.Select(b=>b.FromServiceContract()).ToList(),
+                CbrKeys = request.Bindings.Select(b => b.FromServiceContract()).ToList(),
             };
 
             return cbr;
@@ -190,16 +240,16 @@ namespace DIS.Data.ServiceContract
             if (binding.OEMOptionalInfo != null && binding.OEMOptionalInfo.Length > 0)
             {
                 DC.OemOptionalInfo oemOptionInfo = new DC.OemOptionalInfo();
-                if (binding.OEMOptionalInfo.SingleOrDefault(r => r.Name == "ZPC_MODEL_SKU") != null)
-                    oemOptionInfo.ZPC_MODEL_SKU = binding.OEMOptionalInfo.SingleOrDefault(r => r.Name == "ZPC_MODEL_SKU").Value;
-                if (binding.OEMOptionalInfo.SingleOrDefault(r => r.Name == "ZOEM_EXT_ID") != null)
-                    oemOptionInfo.ZOEM_EXT_ID = binding.OEMOptionalInfo.SingleOrDefault(r => r.Name == "ZOEM_EXT_ID").Value;
-                if (binding.OEMOptionalInfo.SingleOrDefault(r => r.Name == "ZMANUF_GEO_LOC") != null)
-                    oemOptionInfo.ZMANUF_GEO_LOC = binding.OEMOptionalInfo.SingleOrDefault(r => r.Name == "ZMANUF_GEO_LOC").Value;
-                if (binding.OEMOptionalInfo.SingleOrDefault(r => r.Name == "ZPGM_ELIG_VAL") != null)
-                    oemOptionInfo.ZPGM_ELIG_VALUES = binding.OEMOptionalInfo.SingleOrDefault(r => r.Name == "ZPGM_ELIG_VAL").Value;
-                if (binding.OEMOptionalInfo.SingleOrDefault(r => r.Name == "ZCHANNEL_REL_ID") != null)
-                    oemOptionInfo.ZCHANNEL_REL_ID = binding.OEMOptionalInfo.SingleOrDefault(r => r.Name == "ZCHANNEL_REL_ID").Value;
+                if (binding.OEMOptionalInfo.SingleOrDefault(r => r.Name == DC.OhrName.ZPCMODELSKU) != null)
+                    oemOptionInfo.ZPC_MODEL_SKU = binding.OEMOptionalInfo.SingleOrDefault(r => r.Name == DC.OhrName.ZPCMODELSKU).Value;
+                if (binding.OEMOptionalInfo.SingleOrDefault(r => r.Name == DC.OhrName.ZOEMEXTID) != null)
+                    oemOptionInfo.ZOEM_EXT_ID = binding.OEMOptionalInfo.SingleOrDefault(r => r.Name == DC.OhrName.ZOEMEXTID).Value;
+                if (binding.OEMOptionalInfo.SingleOrDefault(r => r.Name == DC.OhrName.ZMANUFGEOLOC) != null)
+                    oemOptionInfo.ZMANUF_GEO_LOC = binding.OEMOptionalInfo.SingleOrDefault(r => r.Name == DC.OhrName.ZMANUFGEOLOC).Value;
+                if (binding.OEMOptionalInfo.SingleOrDefault(r => r.Name == DC.OhrName.ZPGMELIGVAL) != null)
+                    oemOptionInfo.ZPGM_ELIG_VALUES = binding.OEMOptionalInfo.SingleOrDefault(r => r.Name == DC.OhrName.ZPGMELIGVAL).Value;
+                if (binding.OEMOptionalInfo.SingleOrDefault(r => r.Name == DC.OhrName.ZCHANNELRELID) != null)
+                    oemOptionInfo.ZCHANNEL_REL_ID = binding.OEMOptionalInfo.SingleOrDefault(r => r.Name == DC.OhrName.ZCHANNELRELID).Value;
                 strOptionInfo = oemOptionInfo.ToString();
             }
             return new DC.CbrKey()
@@ -235,5 +285,104 @@ namespace DIS.Data.ServiceContract
 
             return reportReturn;
         }
+
+        /// <summary>
+        /// Extension method to convert Tranfer Key DataContract to BindingReportRequest
+        /// </summary>
+        /// <param name="keys"></param>
+        /// <returns></returns>
+        public static DataUpdateRequest ToDataUpdateRequest(this DC.Ohr ohr)
+        {
+            DataUpdateRequest result = new DataUpdateRequest();
+            result.CustomerUpdateUniqueID = ohr.CustomerUpdateUniqueId;
+            result.SoldToCustomerID = ohr.SoldToCustomerId;
+            result.ReceivedFromCustomerID = ohr.ReceivedFromCustomerId;
+            result.DataUpdateLineItems = ToDataUpdateLineItems(ohr.Keys);
+            result.TotalLineItems = result.DataUpdateLineItems.Count();
+            return result;
+        }
+
+        public static DataUpdateLineItem[] ToDataUpdateLineItems(this IEnumerable<DC.KeyInfo> keys)
+        {
+            if (keys.Any())
+            {
+                return keys.Select(k => k.ToDataUpdateLineItem()).ToArray();
+            }
+
+            return null;
+        }
+
+        public static DataUpdateLineItem ToDataUpdateLineItem(this DC.KeyInfo key)
+        {
+            return new DataUpdateLineItem()
+            {
+                ProductKeyID = key.KeyId,
+                //OEMOptionalInfo = key.OemOptionalInfo != null ? key.OemOptionalInfo.ToOEMOptionalInfoExtendedProperty() : null,
+                OEMHardwareReport =key.OemOptionalInfo != null ? key.OemOptionalInfo.ToOEMHardwareReport() : null
+            };
+        }
+
+        public static DC.Ohr FromServiceContract(this DataUpdateAck request)
+        {
+            return new DC.Ohr()
+            {
+                CustomerUpdateUniqueId = request.CustomerUpdateUniqueID.HasValue ? request.CustomerUpdateUniqueID.Value : Guid.NewGuid(),
+                MsUpdateUniqueId = request.MSUpdateUniqueID,
+                SoldToCustomerId = request.SoldToCustomerID,
+                ReceivedFromCustomerId = request.ReceivedFromCustomerID,
+                MsReceivedDateUtc = request.MSReceivedDateUTC,
+                TotalLineItems = request.TotalLineItems,
+                OhrKeys = request.DataUpdateResults != null ? request.DataUpdateResults.Select(b => b.FromServiceContract()).SelectMany(d => d).ToList() : null,
+            };
+
+        }
+
+        public static List<DC.OhrKey> FromServiceContract(this DataUpdateResult request)
+        {
+            List<DC.OhrKey> result = new List<DC.OhrKey>();
+            result.Add(new DC.OhrKey()
+            {
+                KeyId = request.ProductKeyID,
+                Name = DC.OhrName.ProductKeyID,
+                ReasonCode = request.ReasonCode,
+                ReasonCodeDescription = request.ReasonCodeDescription
+            });
+
+            //if (request.OEMOptionalInfoErrors.Any())
+            //{
+            //    result.AddRange(request.OEMOptionalInfoErrors.Select(o => new DC.OhrKey()
+            //    {
+            //        KeyId = request.ProductKeyID,
+            //        Name = o.Name,
+            //        ReasonCode = o.ReasonCode,
+            //        ReasonCodeDescription = o.ReasonCodeDescription
+            //    }));
+            //}
+
+            if (request.OEMHardwareReportErrors != null && request.OEMHardwareReportErrors.Any())
+            {
+                result.AddRange(request.OEMHardwareReportErrors.Select(o => new DC.OhrKey()
+                {
+                    KeyId = request.ProductKeyID,
+                    Name = OhrOemOptionInfonNameHelper.OhrNameMap[o.Name],
+                    ReasonCode = o.ReasonCode,
+                    ReasonCodeDescription = o.ReasonCodeDescription
+                }));
+            }
+
+            return result;
+        }
+    }
+
+    internal class OhrOemOptionInfonNameHelper
+    {
+        public static Dictionary<string, string> OhrNameMap = new Dictionary<string, string>()
+        {
+            { DC.OhrName.FRMFACTORCL1, DC.OemOptionalInfo.ZFrmFactorCl1Name},
+            { DC.OhrName.FRMFACTORCL2, DC.OemOptionalInfo.ZFrmFactorCl2Name},
+            { DC.OhrName.TOUCHSCREEN, DC.OemOptionalInfo.ZTouchScreenName},
+            { DC.OhrName.SCREENSIZE, DC.OemOptionalInfo.ZScreenSizeName},
+            { DC.OhrName.PCMODELSKU, DC.OemOptionalInfo.ZPcModelSkuName},
+        };
     }
 }

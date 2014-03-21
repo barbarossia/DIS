@@ -106,6 +106,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DynamicLibrary.cs" />
+    <Compile Include="Interfaces\IOhrRepository.cs" />
     <Compile Include="Interfaces\ICbrRepository.cs" />
     <Compile Include="Interfaces\IFulfillmentRepository.cs" />
     <Compile Include="Interfaces\IHeadQuarterRepository.cs" />
@@ -126,6 +127,8 @@
     <Compile Include="Mapping\HeadQuarterMap.cs" />
     <Compile Include="Mapping\KeyExportLogMap.cs" />
     <Compile Include="Mapping\KeyHistoryMap.cs" />
+    <Compile Include="Mapping\OHRDataUpdateKeyMap.cs" />
+    <Compile Include="Mapping\OHRDataUpdateMap.cs" />
     <Compile Include="Mapping\TempKeyIdMap.cs" />
     <Compile Include="Mapping\KeyInfoExMap.cs" />
     <Compile Include="Mapping\KeyOperationHistoryMap.cs" />
@@ -140,6 +143,7 @@
     <Compile Include="Mapping\UserHeadQuarterMap.cs" />
     <Compile Include="Mapping\UserMap.cs" />
     <Compile Include="Repository\CbrRepository.cs" />
+    <Compile Include="Repository\OhrRepository.cs" />
     <Compile Include="Repository\FulfillmentRepository.cs" />
     <Compile Include="Repository\HeadQuarterRepository.cs" />
     <Compile Include="Repository\KeyTypeConfigurationRepository.cs" />
