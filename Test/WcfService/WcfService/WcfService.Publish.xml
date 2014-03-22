@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<publishData>
+  <publishProfile publishUrl="https://localhost/" deleteExistingFiles="False" ftpAnonymousLogin="False" ftpPassiveMode="True" msdeploySite="" msdeploySiteID="" msdeployRemoteSitePhysicalPath="" msdeployAllowUntrustedCertificate="False" msdeploySkipExtraFilesOnServer="True" msdeployMarkAsApp="False" profileName="Profile1" publishMethod="FileSystem" replaceMatchingFiles="True" userName="" savePWD="False" userPWD="" SelectedForPublish="True">
+    <file relUrl="bin/WcfService.pdb" publishTime="02/20/2014 22:19:47" />
+    <file relUrl="bin/Microsoft.Http.Extensions.pdb" publishTime="02/20/2014 17:19:59" />
+    <file relUrl="bin/Microsoft.ServiceModel.Web.dll" publishTime="02/20/2014 17:19:52" />
+    <file relUrl="Web.config" publishTime="02/18/2014 22:28:36" />
+    <file relUrl="bin/Microsoft.Http.dll" publishTime="02/20/2014 17:19:44" />
+    <file relUrl="bin/Microsoft.ServiceModel.Web.pdb" publishTime="02/20/2014 17:19:52" />
+    <file relUrl="KeyBinding.svc" publishTime="01/20/2014 17:07:42" />
+    <file relUrl="bin/Microsoft.Http.pdb" publishTime="02/20/2014 17:19:44" />
+    <file relUrl="bin/Microsoft.Http.Extensions.dll" publishTime="02/20/2014 17:19:59" />
+    <file relUrl="bin/WcfService.dll" publishTime="02/20/2014 22:19:47" />
+  </publishProfile>
+</publishData>
